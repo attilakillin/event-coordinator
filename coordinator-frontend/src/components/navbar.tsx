@@ -7,10 +7,11 @@ const navPathList = [
     { name: 'Új bejegyzés', path: '/news/create' }
 ];
 
+/* A component containing the whole page-wide navigation bar present on the top of a page. */
 export default function Navbar() {
     /* Tailwind styling classes. */
-    const selected = 'hover:outline hover:outline-3 hover:outline-stone-700 px-6 py-3 mx-2 text-stone-100 bg-stone-700';
-    const inactive = 'hover:outline hover:outline-3 hover:outline-stone-700 px-6 py-3 mx-2';
+    const selected = 'hover:outline hover:outline-3 hover:outline-stone-800 px-6 py-3 mx-2 text-stone-100 bg-stone-800';
+    const inactive = 'hover:outline hover:outline-3 hover:outline-stone-800 px-6 py-3 mx-2';
 
     /* Apply different classes to nav items based on current path. */
     const { asPath } = useRouter();
@@ -21,7 +22,7 @@ export default function Navbar() {
     /* Generate header markup. */
     return (
         <header>
-            <nav className='flex items-center text-stone-700 bg-stone-100 text-lg px-4 py-5'>
+            <nav className='flex items-center text-stone-800 bg-stone-100 text-lg px-4 py-5'>
                 <div className='ml-2 mr-6'>
                     <span>Event Coordinator</span>
                 </div>
