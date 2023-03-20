@@ -1,7 +1,7 @@
 import Navbar from '@/components/navbar';
 import Head from 'next/head';
 
-export default function Index() {
+export default function NewsIndex() {
     return (
         <>
             <Head>
@@ -10,7 +10,7 @@ export default function Index() {
             </Head>
             <Navbar />
             <div className='flex-1 w-full flex items-center justify-center'>
-                <div>Index</div>
+                Hírek
             </div>
         </>
     );

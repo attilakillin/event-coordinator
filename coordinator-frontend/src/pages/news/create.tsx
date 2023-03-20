@@ -1,7 +1,11 @@
 import Navbar from '@/components/navbar';
+import dynamic from 'next/dynamic';
 import Head from 'next/head';
+import 'react-quill/dist/quill.snow.css';
 
-export default function Index() {
+const ReactQuill = dynamic(() => import('react-quill'), { ssr: false });
+
+export default function NewsCreate() {
     return (
         <>
             <Head>
@@ -10,7 +14,7 @@ export default function Index() {
             </Head>
             <Navbar />
             <div className='flex-1 w-full flex items-center justify-center'>
-                <div>Index</div>
+                <ReactQuill theme='snow' />
             </div>
         </>
     );
