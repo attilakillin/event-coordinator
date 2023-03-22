@@ -16,13 +16,11 @@ export default function NewsCreate() {
     /* Initialize state management. */
     const [title, setTitle] = useState('');
     const [text, setText] = useState('');
-    const [delta, setDelta] = useState({});
     const [isPreview, setIsPreview] = useState(false);
 
     /* Editor change handler (as ReactQuill doesn't output Quill Deltas by default). */
     const handleEditorChange = (content: any, delta: any, source: any, editor: any) => {
         setText(content);
-        setDelta(editor.getContents());
     }
 
     /* Preview button click handler. */
@@ -32,13 +30,13 @@ export default function NewsCreate() {
 
     /* Dummy save button click handler. */
     const handleSaveClickDummy = () => {
-        alert(title + '\n' + JSON.stringify(delta));
+        alert(title + '\n' + text);
     };
 
     /* Customize QuillJS toolbar module. */
     const modules = {
         toolbar: [
-            [{'font': []}],
+            [{'header': 1}, {'header': 2}, {'font': []}],
 
             ['bold', 'italic', 'underline'],
             [{'color': []}, {'background': []}],
@@ -65,20 +63,22 @@ export default function NewsCreate() {
 
                 {
                     isPreview
-                    ? <h1 className='text-stone-800 text-xl mt-6 mb-2'>{title}</h1>
-                    : <input type='text' className='border border-stone-300 block w-full px-4 py-1 mb-2'
-                             value={title} onChange={e => setTitle(e.target.value)}
-                             placeholder='Bejegyzés címe...' />
+                    ? <div className='h-1/2'>
+                        <h1 className='text-stone-800 text-xl mt-6 mb-2'>{title}</h1>
+                        <div className='h-4/5 overflow-auto'>
+                            <QuillRenderer content={text} />
+                        </div>
+                    </div>
+                    : <div className='h-1/2'>
+                        <input type='text' className='border border-stone-300 block w-full px-4 py-1 mb-2'
+                               value={title} onChange={e => setTitle(e.target.value)}
+                               placeholder='Bejegyzés címe...' />
+                        <div className='h-4/5'> 
+                            <ReactQuill theme='snow' className='h-full' value={text} modules={modules}
+                                        onChange={handleEditorChange} placeholder='Bejegyzés szövege...' />
+                        </div>
+                    </div>
                 }
-
-                <div className='h-3/5'>
-                    {
-                        isPreview
-                        ? <QuillRenderer delta={delta} />
-                        : <ReactQuill theme='snow' className='h-full' value={text} modules={modules}
-                                      onChange={handleEditorChange} placeholder='Bejegyzés szövege...' />
-                    }
-                </div>
 
                 <div className='flex justify-end mt-14 mb-4'>
                     <button className={secondary} onClick={handlePreviewClick}>
