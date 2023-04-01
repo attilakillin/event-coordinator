@@ -15,13 +15,8 @@ export default function NewsCreate() {
 
     /* Initialize state management. */
     const [title, setTitle] = useState('');
-    const [text, setText] = useState('');
+    const [content, setContent] = useState('');
     const [isPreview, setIsPreview] = useState(false);
-
-    /* Editor change handler (as ReactQuill doesn't output Quill Deltas by default). */
-    const handleEditorChange = (content: any, delta: any, source: any, editor: any) => {
-        setText(content);
-    }
 
     /* Preview button click handler. */
     const handlePreviewClick = () => {
@@ -29,8 +24,12 @@ export default function NewsCreate() {
     };
 
     /* Dummy save button click handler. */
-    const handleSaveClickDummy = () => {
-        alert(title + '\n' + text);
+    const handleSaveClick = () => {
+        fetch('http://localhost:8080', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ title: title, content: content })
+        }).then(response => console.log(response))
     };
 
     /* Customize QuillJS toolbar module. */
@@ -66,7 +65,7 @@ export default function NewsCreate() {
                     ? <div className='h-1/2'>
                         <h1 className='text-stone-800 text-xl mt-6 mb-2'>{title}</h1>
                         <div className='h-4/5 overflow-auto'>
-                            <QuillRenderer content={text} />
+                            <QuillRenderer content={content} />
                         </div>
                     </div>
                     : <div className='h-1/2'>
@@ -74,8 +73,8 @@ export default function NewsCreate() {
                                value={title} onChange={e => setTitle(e.target.value)}
                                placeholder='Bejegyzés címe...' />
                         <div className='h-4/5'> 
-                            <ReactQuill theme='snow' className='h-full' value={text} modules={modules}
-                                        onChange={handleEditorChange} placeholder='Bejegyzés szövege...' />
+                            <ReactQuill theme='snow' className='h-full' value={content} modules={modules}
+                                        onChange={setContent} placeholder='Bejegyzés szövege...' />
                         </div>
                     </div>
                 }
@@ -84,7 +83,7 @@ export default function NewsCreate() {
                     <button className={secondary} onClick={handlePreviewClick}>
                         {isPreview ? 'Szerkesztés' : 'Előnézet'}
                         </button>
-                    <button className={primary} onClick={handleSaveClickDummy}>Mentés</button>
+                    <button className={primary} onClick={handleSaveClick}>Mentés</button>
                 </div>
             </div>
         </>
