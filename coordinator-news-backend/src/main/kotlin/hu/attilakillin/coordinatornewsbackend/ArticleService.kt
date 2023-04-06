@@ -15,7 +15,7 @@ class ArticleService(
 ) {
 
     fun saveArticle(article: ArticleDTO): Article {
-        val sanitizedContent = Jsoup.clean(article.content, Safelist.basicWithImages())
+        val sanitizedContent = Jsoup.clean(article.content, Safelist.basicWithImages().addAttributes("span", "style"))
         val textContent = Jsoup.parse(sanitizedContent).wholeText()
 
         return repository.save(Article(

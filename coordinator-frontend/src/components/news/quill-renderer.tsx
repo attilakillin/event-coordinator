@@ -1,4 +1,5 @@
 import DOMPurify from "dompurify";
+import dynamic from "next/dynamic";
 
 /* Custom prop type accepting a HTML inner string. */
 interface ComponentProps {
@@ -6,7 +7,7 @@ interface ComponentProps {
 }
 
 /* A component that can accept a HTML content output by QuillJS, and formats it appropriately. */
-export default function QuillRenderer(props: ComponentProps) {
+function QuillRenderer(props: ComponentProps) {
     let dom = new DOMParser().parseFromString(props.content, 'text/html').body;
 
     /* The heading tags have their styles removed, and need to be reformatted. */
@@ -51,3 +52,5 @@ export default function QuillRenderer(props: ComponentProps) {
         <div className='text-stone-800' dangerouslySetInnerHTML={{ __html: result }}></div>
     );
 }
+
+export default dynamic(() => Promise.resolve(QuillRenderer), { ssr: false });

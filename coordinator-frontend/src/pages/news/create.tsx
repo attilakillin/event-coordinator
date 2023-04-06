@@ -1,7 +1,8 @@
 import Navbar from '@/components/navbar';
-import QuillRenderer from '@/components/quill-renderer';
+import QuillRenderer from '@/components/news/quill-renderer';
 import dynamic from 'next/dynamic';
 import Head from 'next/head';
+import { useRouter } from 'next/router';
 import { useState } from 'react';
 import 'react-quill/dist/quill.snow.css';
 
@@ -12,6 +13,8 @@ export default function NewsCreate() {
     /* Tailwind styling classes. */
     const primary = 'hover:outline hover:outline-3 hover:outline-stone-800 px-8 py-3 text-lg bg-stone-800 text-stone-100';
     const secondary = 'hover:outline hover:outline-3 hover:outline-stone-800 px-8 py-3 text-lg text-stone-800 mr-4';
+
+    const router = useRouter();
 
     /* Initialize state management. */
     const [title, setTitle] = useState('');
@@ -29,7 +32,12 @@ export default function NewsCreate() {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ title: title, content: content })
-        }).then(response => console.log(response))
+        }).then(response => {
+            console.log(response)
+            if (response.status === 201) {
+                router.push('/news/');
+            }
+        });
     };
 
     /* Customize QuillJS toolbar module. */
