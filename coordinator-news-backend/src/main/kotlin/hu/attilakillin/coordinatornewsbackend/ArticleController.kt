@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
@@ -53,6 +54,16 @@ class ArticleController(
             .toUri()
 
         return ResponseEntity.created(uri).build()
+    }
+
+    @PutMapping("/{id}")
+    fun postArticle(@PathVariable id: String, @RequestBody article: ArticleDTO): ResponseEntity<Unit> {
+        val parsedId = id.toLongOrNull()
+            ?: return ResponseEntity.badRequest().build()
+        service.updateArticle(parsedId, article)
+            ?: return ResponseEntity.notFound().build()
+
+        return ResponseEntity.ok().build()
     }
 
     @DeleteMapping("/{id}")

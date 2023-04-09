@@ -3,7 +3,7 @@ import QuillRenderer from '@/components/news/quill-renderer';
 import dynamic from 'next/dynamic';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import 'react-quill/dist/quill.snow.css';
 
 /* QuillJS has to be loaded client-side, we can't render it on the server. */
@@ -21,6 +21,18 @@ export default function NewsCreate() {
     const [content, setContent] = useState('');
     const [isPreview, setIsPreview] = useState(false);
 
+    /* If we are editing an already written article, load its content from the server. */
+    if (typeof router.query.id !== 'undefined') {
+        useEffect(() => {
+            fetch('http://localhost:8080/' + router.query.id![0], { method: 'GET' })
+                .then(response => response.json())
+                .then(data => {
+                    setTitle(data.title);
+                    setContent(data.content);
+                });
+        }, []);
+    }
+
     /* Preview button click handler. */
     const handlePreviewClick = () => {
         setIsPreview(value => !value);
@@ -28,16 +40,27 @@ export default function NewsCreate() {
 
     /* Dummy save button click handler. */
     const handleSaveClick = () => {
-        fetch('http://localhost:8080', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ title: title, content: content })
-        }).then(response => {
-            console.log(response)
-            if (response.status === 201) {
-                router.push('/news/');
-            }
-        });
+        if (typeof router.query.id !== 'undefined') {
+            fetch('http://localhost:8080/' + router.query.id![0], {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ title: title, content: content })
+            }).then(response => {
+                if (response.status === 200) {
+                    router.push('/news/');
+                }
+            });
+        } else {
+            fetch('http://localhost:8080', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ title: title, content: content })
+            }).then(response => {
+                if (response.status === 201) {
+                    router.push('/news/');
+                }
+            });
+        }
     };
 
     /* Customize QuillJS toolbar module. */

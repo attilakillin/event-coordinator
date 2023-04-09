@@ -28,6 +28,15 @@ export default function NewsView(props: ComponentProps) {
             });
     }, []);
 
+    const handleEditButton = () => {
+        router.push('/news/edit/' + router.query.id);
+    };
+
+    const handleDeleteButton = () => {
+        fetch('http://localhost:8080/' + router.query.id, { method: 'DELETE' })
+            .then(() => router.back());
+    };
+
     return (
         <>
             <Head>
@@ -46,7 +55,9 @@ export default function NewsView(props: ComponentProps) {
                 </div>
 
                 <div className='flex justify-end mt-14 mb-4'>
-                    <button className={secondary} onClick={() => router.back()}>Vissza</button>
+                    <button className={secondary} onClick={handleEditButton}>Szerkesztés</button>
+                    <button className={secondary} onClick={handleDeleteButton}>Törlés</button>
+                    <button className={primary} onClick={() => router.back()}>Vissza</button>
                 </div>
             </div>
         </>

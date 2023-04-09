@@ -15,7 +15,7 @@ class ArticleService(
 ) {
 
     fun saveArticle(article: ArticleDTO): Article {
-        val sanitizedContent = Jsoup.clean(article.content, Safelist.basicWithImages().addAttributes("span", "style"))
+        val sanitizedContent = Jsoup.clean(article.content, Safelist.basicWithImages().addAttributes("span", "style", "class"))
         val textContent = Jsoup.parse(sanitizedContent).wholeText()
 
         return repository.save(Article(
@@ -23,6 +23,19 @@ class ArticleService(
             text = textContent,
             content = sanitizedContent
         ))
+    }
+
+    fun updateArticle(id: Long, dto: ArticleDTO): Article? {
+        val sanitizedContent = Jsoup.clean(dto.content, Safelist.basicWithImages().addAttributes("span", "style", "class"))
+        val textContent = Jsoup.parse(sanitizedContent).wholeText()
+
+        val article = repository.findByIdOrNull(id) ?: return null
+
+        article.title = dto.title
+        article.text = textContent
+        article.content = sanitizedContent
+
+        return repository.save(article)
     }
 
     fun deleteArticle(id: Long) {
