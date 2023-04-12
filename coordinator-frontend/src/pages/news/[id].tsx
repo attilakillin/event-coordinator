@@ -26,7 +26,7 @@ export default function NewsView(props: ComponentProps) {
                 setTitle(data.title);
                 setContent(data.content);
             });
-    }, []);
+    }, [router.query.id]);
 
     const handleEditButton = () => {
         router.push('/news/edit/' + router.query.id);

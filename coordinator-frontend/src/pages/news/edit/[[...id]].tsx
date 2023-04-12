@@ -22,16 +22,16 @@ export default function NewsCreate() {
     const [isPreview, setIsPreview] = useState(false);
 
     /* If we are editing an already written article, load its content from the server. */
-    if (typeof router.query.id !== 'undefined') {
-        useEffect(() => {
+    useEffect(() => {
+        if (typeof router.query.id !== 'undefined') {
             fetch('http://localhost:8080/' + router.query.id![0], { method: 'GET' })
                 .then(response => response.json())
                 .then(data => {
                     setTitle(data.title);
                     setContent(data.content);
                 });
-        }, []);
-    }
+        }
+    }, [router.query.id]);
 
     /* Preview button click handler. */
     const handlePreviewClick = () => {
