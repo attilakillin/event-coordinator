@@ -1,7 +1,7 @@
-package hu.attilakillin.coordinatornewsbackend
+package hu.attilakillin.coordinatorarticlesbackend
 
-import hu.attilakillin.coordinatornewsbackend.dto.ArticleDTO
-import hu.attilakillin.coordinatornewsbackend.dto.ArticleSummaryDTO
+import hu.attilakillin.coordinatorarticlesbackend.dto.ArticleDTO
+import hu.attilakillin.coordinatorarticlesbackend.dto.ArticleSummaryDTO
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.CrossOrigin
 import org.springframework.web.bind.annotation.DeleteMapping
@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder
 
 @RestController
-@CrossOrigin(origins = ["http://localhost:3000"])
+@CrossOrigin(origins = ["#{propertiesConfiguration.crossOrigin}"])
 class ArticleController(
     private val service: ArticleService
 ) {

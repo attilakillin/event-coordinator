@@ -1,4 +1,4 @@
-package hu.attilakillin.coordinatornewsbackend.dal
+package hu.attilakillin.coordinatorarticlesbackend.dal
 
 import jakarta.persistence.Entity
 import jakarta.persistence.GeneratedValue

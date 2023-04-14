@@ -1,8 +1,8 @@
-package hu.attilakillin.coordinatornewsbackend
+package hu.attilakillin.coordinatorarticlesbackend
 
-import hu.attilakillin.coordinatornewsbackend.dal.Article
-import hu.attilakillin.coordinatornewsbackend.dal.ArticleRepository
-import hu.attilakillin.coordinatornewsbackend.dto.ArticleDTO
+import hu.attilakillin.coordinatorarticlesbackend.dal.Article
+import hu.attilakillin.coordinatorarticlesbackend.dal.ArticleRepository
+import hu.attilakillin.coordinatorarticlesbackend.dto.ArticleDTO
 import org.jsoup.Jsoup
 import org.jsoup.safety.Safelist
 import org.springframework.data.domain.Pageable
@@ -13,9 +13,10 @@ import org.springframework.stereotype.Service
 class ArticleService(
     private val repository: ArticleRepository
 ) {
+    private val sanitizer = Safelist.basicWithImages().addAttributes("span", "style", "class")
 
     fun saveArticle(article: ArticleDTO): Article {
-        val sanitizedContent = Jsoup.clean(article.content, Safelist.basicWithImages().addAttributes("span", "style", "class"))
+        val sanitizedContent = Jsoup.clean(article.content, sanitizer)
         val textContent = Jsoup.parse(sanitizedContent).wholeText()
 
         return repository.save(Article(
@@ -26,7 +27,7 @@ class ArticleService(
     }
 
     fun updateArticle(id: Long, dto: ArticleDTO): Article? {
-        val sanitizedContent = Jsoup.clean(dto.content, Safelist.basicWithImages().addAttributes("span", "style", "class"))
+        val sanitizedContent = Jsoup.clean(dto.content, sanitizer)
         val textContent = Jsoup.parse(sanitizedContent).wholeText()
 
         val article = repository.findByIdOrNull(id) ?: return null

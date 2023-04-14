@@ -1,4 +1,4 @@
-package hu.attilakillin.coordinatornewsbackend.dto
+package hu.attilakillin.coordinatorarticlesbackend.dto
 
 data class ArticleDTO(
     val title: String,

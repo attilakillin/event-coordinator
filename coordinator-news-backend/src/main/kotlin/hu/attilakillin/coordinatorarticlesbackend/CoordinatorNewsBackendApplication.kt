@@ -1,4 +1,4 @@
-package hu.attilakillin.coordinatornewsbackend
+package hu.attilakillin.coordinatorarticlesbackend
 
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication

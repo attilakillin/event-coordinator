@@ -1,4 +1,4 @@
-package hu.attilakillin.coordinatornewsbackend.dal
+package hu.attilakillin.coordinatorarticlesbackend.dal
 
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable

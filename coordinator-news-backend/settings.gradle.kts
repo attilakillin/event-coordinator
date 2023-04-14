@@ -1,1 +1,1 @@
-rootProject.name = "coordinator-news-backend"
+rootProject.name = "coordinator-articles-backend"
