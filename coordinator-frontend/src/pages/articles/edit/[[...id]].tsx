@@ -24,14 +24,14 @@ export default function ArticlesCreate() {
     /* If we are editing an already written article, load its content from the server. */
     useEffect(() => {
         if (typeof router.query.id !== 'undefined') {
-            fetch('http://localhost:8080/' + router.query.id![0], { method: 'GET' })
+            fetch(process.env.NEXT_PUBLIC_BACKEND_URL! + '/' + router.query.id![0], { method: 'GET' })
                 .then(response => response.json())
                 .then(data => {
                     setTitle(data.title);
                     setContent(data.content);
                 });
         }
-    }, [router.query.id]);
+    }, [router.query.id, process.env.NEXT_PUBLIC_BACKEND_URL]);
 
     /* Preview button click handler. */
     const handlePreviewClick = () => {
@@ -41,23 +41,23 @@ export default function ArticlesCreate() {
     /* Dummy save button click handler. */
     const handleSaveClick = () => {
         if (typeof router.query.id !== 'undefined') {
-            fetch('http://localhost:8080/' + router.query.id![0], {
+            fetch(process.env.NEXT_PUBLIC_BACKEND_URL! + '/' + router.query.id![0], {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ title: title, content: content })
             }).then(response => {
                 if (response.status === 200) {
-                    router.push('/news/');
+                    router.push('/articles/');
                 }
             });
         } else {
-            fetch('http://localhost:8080', {
+            fetch(process.env.NEXT_PUBLIC_BACKEND_URL!, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ title: title, content: content })
             }).then(response => {
                 if (response.status === 201) {
-                    router.push('/news/');
+                    router.push('/articles/');
                 }
             });
         }

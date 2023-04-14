@@ -17,7 +17,9 @@ services:
         build:
             context: ./coordinator-articles-backend
             args:
-                config: ./coordinator-articles-backend/docker.properties
+                config: docker.properties
+        ports:
+            - "8080:8080"
         networks:
             - internal
     articles-db:

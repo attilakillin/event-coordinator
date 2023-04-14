@@ -15,7 +15,7 @@ export default function ArticlesView() {
     const [content, setContent] = useState('');
 
     useEffect(() => {
-        fetch('http://localhost:8080/' + router.query.id, { method: 'GET' })
+        fetch(process.env.NEXT_PUBLIC_BACKEND_URL! + '/' + router.query.id, { method: 'GET' })
             .then(response => response.json())
             .then(data => {
                 setTitle(data.title);
@@ -24,11 +24,11 @@ export default function ArticlesView() {
     }, [router.query.id]);
 
     const handleEditButton = () => {
-        router.push('/news/edit/' + router.query.id);
+        router.push('/articles/edit/' + router.query.id);
     };
 
     const handleDeleteButton = () => {
-        fetch('http://localhost:8080/' + router.query.id, { method: 'DELETE' })
+        fetch(process.env.NEXT_PUBLIC_BACKEND_URL! + '/' + router.query.id, { method: 'DELETE' })
             .then(() => router.back());
     };
 

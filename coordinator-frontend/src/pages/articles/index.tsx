@@ -8,14 +8,14 @@ export default function ArticlesIndex() {
     const [articles, setArticles] = useState([]);
 
     useEffect(() => {
-        fetch('http://localhost:8080', { method: 'GET' })
+        fetch(process.env.NEXT_PUBLIC_BACKEND_URL!, { method: 'GET' })
             .then(response => response.json())
             .then(data => setArticles(data));
     }, []);
 
     const router = useRouter();
     const onClick = (id: number) => {
-        router.push('/news/' + id);
+        router.push('/articles/' + id);
     };
 
     return (
