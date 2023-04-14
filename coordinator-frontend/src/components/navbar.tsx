@@ -3,8 +3,8 @@ import { useRouter } from 'next/router';
 
 /* These will be used to populate the left-aligned navigation bar item list. */
 const navPathList = [
-    { name: 'Hírek', path: '/news' },
-    { name: 'Új bejegyzés', path: '/news/edit' }
+    { name: 'Hírek', path: '/articles' },
+    { name: 'Új bejegyzés', path: '/articles/edit' }
 ];
 
 /* A component containing the whole page-wide navigation bar present on the top of a page. */

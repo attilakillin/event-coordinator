@@ -1,10 +1,10 @@
 import Navbar from '@/components/navbar';
-import ArticleCard from '@/components/news/article-card';
+import ArticleCard from '@/components/articles/article-card';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 
-export default function NewsIndex() {
+export default function ArticlesIndex() {
     const [articles, setArticles] = useState([]);
 
     useEffect(() => {

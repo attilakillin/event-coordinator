@@ -1,5 +1,5 @@
 import Navbar from '@/components/navbar';
-import QuillRenderer from '@/components/news/quill-renderer';
+import QuillRenderer from '@/components/articles/quill-renderer';
 import dynamic from 'next/dynamic';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
@@ -9,7 +9,7 @@ import 'react-quill/dist/quill.snow.css';
 /* QuillJS has to be loaded client-side, we can't render it on the server. */
 const ReactQuill = dynamic(() => import('react-quill'), { ssr: false });
 
-export default function NewsCreate() {
+export default function ArticlesCreate() {
     /* Tailwind styling classes. */
     const primary = 'hover:outline hover:outline-3 hover:outline-stone-800 px-8 py-3 text-lg bg-stone-800 text-stone-100';
     const secondary = 'hover:outline hover:outline-3 hover:outline-stone-800 px-8 py-3 text-lg text-stone-800 mr-4';

@@ -12,6 +12,14 @@ services:
             - internal
 
     # Articles components
+    articles-backend:
+        container_name: articles-backend
+        build:
+            context: ./coordinator-articles-backend
+            args:
+                config: ./coordinator-articles-backend/docker.properties
+        networks:
+            - internal
     articles-db:
         container_name: articles-db
         image: mysql:8.0

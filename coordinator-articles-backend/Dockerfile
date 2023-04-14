@@ -1,0 +1,17 @@
+FROM openjdk:17 AS extractor
+WORKDIR /app
+COPY ./build/coordinator-articles-backend.jar app.jar
+RUN java -Djarmode=layertools -jar app.jar extract
+
+FROM openjdk:17 AS runner
+WORKDIR /app
+ARG config
+
+COPY --from=extractor /app/dependencies/ ./
+COPY --from=extractor /app/spring-boot-loader/ ./
+COPY --from=extractor /app/snapshot-dependencies/ ./
+COPY --from=extractor /app/application/ ./
+COPY ${config} ./config/application.properties
+
+EXPOSE 8080
+ENTRYPOINT ["java", "org.springframework.boot.loader.JarLauncher"]

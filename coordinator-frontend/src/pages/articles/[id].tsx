@@ -1,15 +1,10 @@
 import Navbar from "@/components/navbar";
-import QuillRenderer from "@/components/news/quill-renderer";
+import QuillRenderer from "@/components/articles/quill-renderer";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 
-/* Custom prop type accepting an article id. */
-interface ComponentProps {
-    id: number
-}
-
-export default function NewsView(props: ComponentProps) {
+export default function ArticlesView() {
     /* Tailwind styling classes. */
     const primary = 'hover:outline hover:outline-3 hover:outline-stone-800 px-8 py-3 text-lg bg-stone-800 text-stone-100';
     const secondary = 'hover:outline hover:outline-3 hover:outline-stone-800 px-8 py-3 text-lg text-stone-800 mr-4';
