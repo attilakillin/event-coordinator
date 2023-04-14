@@ -31,7 +31,7 @@ export default function ArticlesCreate() {
                     setContent(data.content);
                 });
         }
-    }, [router.query.id, process.env.NEXT_PUBLIC_BACKEND_URL]);
+    }, [router.query.id]);
 
     /* Preview button click handler. */
     const handlePreviewClick = () => {

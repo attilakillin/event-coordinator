@@ -11,6 +11,17 @@ services:
         networks:
             - internal
 
+    # Common proxy, all requests not made to the frontend
+    # are routed through this reverse proxy
+    common-proxy:
+        container_name: common-proxy
+        build:
+            context: ./coordinator-proxy
+        ports:
+            - "80:80"
+        networks:
+            - internal
+
     # Articles components
     articles-backend:
         container_name: articles-backend

@@ -13,7 +13,10 @@ import org.springframework.stereotype.Service
 class ArticleService(
     private val repository: ArticleRepository
 ) {
-    private val sanitizer = Safelist.basicWithImages().addAttributes("span", "style", "class")
+    private val sanitizer = Safelist.basicWithImages()
+        .addAttributes("span", "style", "class")
+        .addAttributes("h1", "class")
+        .addAttributes("h2", "class")
 
     fun saveArticle(article: ArticleDTO): Article {
         val sanitizedContent = Jsoup.clean(article.content, sanitizer)
