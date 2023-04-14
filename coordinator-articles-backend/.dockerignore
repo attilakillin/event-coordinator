@@ -1,8 +1,9 @@
 Dockerfile
 .dockerignore
 
-/node_modules
-/.next
+/.gradle
+/.idea
+/build
 
 /.git
 .gitignore
