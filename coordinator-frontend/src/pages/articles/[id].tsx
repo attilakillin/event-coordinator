@@ -1,26 +1,24 @@
 import Navbar from "@/components/navbar";
 import QuillRenderer from "@/components/articles/quill-renderer";
-import Head from "next/head";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
+import Button from "@/components/builtin/button";
+import AppHead from "@/components/builtin/app_head";
+import { ArticleService } from "@/services/article-service";
+import { toast } from "react-toastify";
 
 export default function ArticlesView() {
-    /* Tailwind styling classes. */
-    const primary = 'hover:outline hover:outline-3 hover:outline-stone-800 px-8 py-3 text-lg bg-stone-800 text-stone-100';
-    const secondary = 'hover:outline hover:outline-3 hover:outline-stone-800 px-8 py-3 text-lg text-stone-800 mr-4';
-    
     const router = useRouter();
 
     const [title, setTitle] = useState('');
     const [content, setContent] = useState('');
 
     useEffect(() => {
-        fetch(process.env.NEXT_PUBLIC_BACKEND_URL! + '/' + router.query.id, { method: 'GET' })
-            .then(response => response.json())
-            .then(data => {
-                setTitle(data.title);
-                setContent(data.content);
-            });
+        if (typeof router.query.id !== 'undefined') {
+            ArticleService.get(router.query.id![0])
+                .then(data => { setTitle(data.title); setContent(data.content); })
+                .catch(_ => toast.error('Hiba történt: A cikk betöltése nem sikerült!'));
+        }
     }, [router.query.id]);
 
     const handleEditButton = () => {
@@ -28,17 +26,14 @@ export default function ArticlesView() {
     };
 
     const handleDeleteButton = () => {
-        fetch(process.env.NEXT_PUBLIC_BACKEND_URL! + '/' + router.query.id, { method: 'DELETE' })
-            .then(() => router.back());
+        ArticleService.remove(router.query.id![0])
+            .then(() => router.back())
+            .catch(_ => toast.error('Hiba történt: A cikk törlése nem sikerült!'));
     };
 
     return (
         <>
-            <Head>
-                <title>{title + ' - Coordinator'}</title>
-                <meta name='viewport' content='width=device-width, initial-scale=1' />
-            </Head>
-            
+            <AppHead title={title + ' - Coordinator'} />
             <Navbar />
 
             <div className='flex-1 container mx-auto px-4'>
@@ -50,9 +45,9 @@ export default function ArticlesView() {
                 </div>
 
                 <div className='flex justify-end mt-14 mb-4'>
-                    <button className={secondary} onClick={handleEditButton}>Szerkesztés</button>
-                    <button className={secondary} onClick={handleDeleteButton}>Törlés</button>
-                    <button className={primary} onClick={() => router.back()}>Vissza</button>
+                    <Button onClick={handleEditButton} className='mr-4'>Szerkesztés</Button>
+                    <Button onClick={handleDeleteButton} className='mr-4'>Törlés</Button>
+                    <Button onClick={() => router.back()} primary>Vissza</Button>
                 </div>
             </div>
         </>

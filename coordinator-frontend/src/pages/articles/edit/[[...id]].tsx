@@ -1,19 +1,18 @@
 import Navbar from '@/components/navbar';
 import QuillRenderer from '@/components/articles/quill-renderer';
 import dynamic from 'next/dynamic';
-import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import 'react-quill/dist/quill.snow.css';
+import Button from '@/components/builtin/button';
+import AppHead from '@/components/builtin/app_head';
+import { ArticleService } from '@/services/article-service';
+import { toast } from 'react-toastify';
 
 /* QuillJS has to be loaded client-side, we can't render it on the server. */
 const ReactQuill = dynamic(() => import('react-quill'), { ssr: false });
 
 export default function ArticlesCreate() {
-    /* Tailwind styling classes. */
-    const primary = 'hover:outline hover:outline-3 hover:outline-stone-800 px-8 py-3 text-lg bg-stone-800 text-stone-100';
-    const secondary = 'hover:outline hover:outline-3 hover:outline-stone-800 px-8 py-3 text-lg text-stone-800 mr-4';
-
     const router = useRouter();
 
     /* Initialize state management. */
@@ -24,12 +23,9 @@ export default function ArticlesCreate() {
     /* If we are editing an already written article, load its content from the server. */
     useEffect(() => {
         if (typeof router.query.id !== 'undefined') {
-            fetch(process.env.NEXT_PUBLIC_BACKEND_URL! + '/' + router.query.id![0], { method: 'GET' })
-                .then(response => response.json())
-                .then(data => {
-                    setTitle(data.title);
-                    setContent(data.content);
-                });
+            ArticleService.get(router.query.id![0])
+                .then(data => { setTitle(data.title); setContent(data.content); })
+                .catch(_ => toast.error('Hiba történt: A cikk betöltése nem sikerült!'));
         }
     }, [router.query.id]);
 
@@ -41,25 +37,13 @@ export default function ArticlesCreate() {
     /* Dummy save button click handler. */
     const handleSaveClick = () => {
         if (typeof router.query.id !== 'undefined') {
-            fetch(process.env.NEXT_PUBLIC_BACKEND_URL! + '/' + router.query.id![0], {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ title: title, content: content })
-            }).then(response => {
-                if (response.status === 200) {
-                    router.push('/articles/');
-                }
-            });
+            ArticleService.put(router.query.id![0], title, content)
+                .then(_ => router.push('/articles'))
+                .catch(_ => toast.error('Hiba történt: A cikk mentése nem sikerült!'));
         } else {
-            fetch(process.env.NEXT_PUBLIC_BACKEND_URL!, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ title: title, content: content })
-            }).then(response => {
-                if (response.status === 201) {
-                    router.push('/articles/');
-                }
-            });
+            ArticleService.post(title, content)
+                .then(_ => router.push('/articles'))
+                .catch(_ => toast.error('Hiba történt: A cikk mentése nem sikerült!'));
         }
     };
 
@@ -81,11 +65,7 @@ export default function ArticlesCreate() {
     /* Generate page markup. */
     return (
         <>
-            <Head>
-                <title>Új bejegyzés - Coordinator</title>
-                <meta name='viewport' content='width=device-width, initial-scale=1' />
-            </Head>
-            
+            <AppHead title='Új bejegyzés - Coordinator' />
             <Navbar />
 
             <div className='flex-1 container mx-auto px-4'>
@@ -111,10 +91,10 @@ export default function ArticlesCreate() {
                 }
 
                 <div className='flex justify-end mt-14 mb-4'>
-                    <button className={secondary} onClick={handlePreviewClick}>
+                    <Button onClick={handlePreviewClick} className='mr-4'>
                         {isPreview ? 'Szerkesztés' : 'Előnézet'}
-                        </button>
-                    <button className={primary} onClick={handleSaveClick}>Mentés</button>
+                    </Button>
+                    <Button onClick={handleSaveClick} primary>Mentés</Button>
                 </div>
             </div>
         </>
