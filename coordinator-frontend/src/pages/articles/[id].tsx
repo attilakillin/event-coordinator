@@ -6,6 +6,7 @@ import Button from "@/components/builtin/button";
 import AppHead from "@/components/builtin/app_head";
 import { ArticleService } from "@/services/article-service";
 import { toast } from "react-toastify";
+import { AuthService } from "@/services/auth-service";
 
 export default function ArticlesView() {
     const router = useRouter();
@@ -20,6 +21,13 @@ export default function ArticlesView() {
                 .catch(_ => toast.error('Hiba történt: A cikk betöltése nem sikerült!'));
         }
     }, [router.query.id]);
+
+    const [loggedIn, setLoggedIn] = useState(false);
+    useEffect(() => {
+        AuthService.validate()
+            .then(_ => setLoggedIn(true))
+            .catch(_ => setLoggedIn(false));
+    }, []);
 
     const handleEditButton = () => {
         router.push('/articles/edit/' + router.query.id);
@@ -45,8 +53,10 @@ export default function ArticlesView() {
                 </div>
 
                 <div className='flex justify-end mt-14 mb-4'>
-                    <Button onClick={handleEditButton} className='mr-4'>Szerkesztés</Button>
-                    <Button onClick={handleDeleteButton} className='mr-4'>Törlés</Button>
+                    {(loggedIn) && <>
+                        <Button onClick={handleEditButton} className='mr-4'>Szerkesztés</Button>
+                        <Button onClick={handleDeleteButton} className='mr-4'>Törlés</Button>
+                    </>}
                     <Button onClick={() => router.back()} primary>Vissza</Button>
                 </div>
             </div>

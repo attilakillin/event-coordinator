@@ -1,9 +1,15 @@
+import { AuthService } from '@/services/auth-service';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
+import { useEffect, useState } from 'react';
 
-/* These will be used to populate the left-aligned navigation bar item list. */
-const navPathList = [
+/* These will be used to populate the left-aligned navigation bar item list.
+ * The latter one is only visible when the user is authenticated. */
+const basePathList = [
     { name: 'Hírek', path: '/articles' },
+];
+
+const authPathList = [
     { name: 'Új bejegyzés', path: '/articles/edit' }
 ];
 
@@ -13,9 +19,16 @@ export default function Navbar() {
     const selected = 'hover:outline hover:outline-3 hover:outline-stone-800 px-6 py-3 mx-2 text-stone-100 bg-stone-800';
     const inactive = 'hover:outline hover:outline-3 hover:outline-stone-800 px-6 py-3 mx-2';
 
+    const [loggedIn, setLoggedIn] = useState(false);
+    useEffect(() => {
+        AuthService.validate()
+            .then(_ => setLoggedIn(true))
+            .catch(_ => setLoggedIn(false));
+    }, []);
+
     /* Apply different classes to nav items based on current path. */
     const { asPath } = useRouter();
-    const links = navPathList.map((item, i) =>
+    const mapLinks = (links: Array<any>) => links.map((item, i) =>
         <Link href={item.path} key={i} className={(asPath === item.path) ? selected : inactive}>{item.name}</Link>
     );
 
@@ -27,12 +40,17 @@ export default function Navbar() {
                     <span>Event Coordinator</span>
                 </div>
                 <div className='mr-auto'>
-                    {links}
+                    {(loggedIn) ? mapLinks(basePathList.concat(authPathList)) : mapLinks(basePathList)}
                 </div>
                 <div>
-                    <Link href='/admin/login' className={(asPath === '/admin/login') ? selected : inactive}>
-                        Bejelentkezés
-                    </Link>
+                    {(loggedIn)
+                    ?   <Link href='/admin/logout' className={inactive}>
+                            Kijelentkezés
+                        </Link>
+                    :   <Link href='/admin/login' className={(asPath === '/admin/login') ? selected : inactive}>
+                            Bejelentkezés
+                        </Link>
+                    }
                 </div>
             </nav>
         </header>

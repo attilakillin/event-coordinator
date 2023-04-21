@@ -3,14 +3,12 @@ export namespace ArticleService {
 
     export function search(keywords: string): Promise<any> {
         return fetch(url + '?keywords=' + encodeURIComponent(keywords), { method: 'GET' })
-            .then(r => (r.ok) ? r : Promise.reject())
-            .then(r => r.json());
+            .then(r => (r.ok) ? r.json() : Promise.reject());
     }
 
     export function get(id: string): Promise<any> {
         return fetch(url + '/' + id, { method: 'GET' })
-            .then(r => (r.ok) ? r : Promise.reject())
-            .then(r => r.json())
+            .then(r => (r.ok) ? r.json() : Promise.reject());
     }
 
     export function post(title: string, content: string): Promise<any> {

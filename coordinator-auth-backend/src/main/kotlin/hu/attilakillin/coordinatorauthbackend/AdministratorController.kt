@@ -38,8 +38,8 @@ class AdministratorController(
     }
 
     @PostMapping("/validate")
-    fun validate(@RequestBody token: String): ResponseEntity<ValidationDTO> {
-        val valid = service.validateToken(token)
+    fun validate(@RequestBody token: JwtDTO): ResponseEntity<ValidationDTO> {
+        val valid = service.validateToken(token.token)
 
         return ResponseEntity.ok(ValidationDTO(valid))
     }

@@ -3,15 +3,20 @@ import Button from "@/components/builtin/button";
 import Navbar from "@/components/navbar";
 import { AuthService } from "@/services/auth-service";
 import Link from "next/link";
+import { useRouter } from "next/router";
 import { useState } from "react";
+import { toast } from "react-toastify";
 
 export default function AdminLogin() {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
 
+    const router = useRouter();
+
     const handleLoginClick = () => {
         AuthService.login(username, password)
-            .then(data => console.log(data))
+            .then(_ => router.push('/'))
+            .catch(_ => toast.error('Hiba történt: A megadott azonosítók nem helyesek!'));
     }
 
     return (
