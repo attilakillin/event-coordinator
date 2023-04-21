@@ -30,7 +30,9 @@ export default function Navbar() {
                     {links}
                 </div>
                 <div>
-                    <Link href='/' className={inactive}>Bejelentkezés</Link>
+                    <Link href='/admin/login' className={(asPath === '/admin/login') ? selected : inactive}>
+                        Bejelentkezés
+                    </Link>
                 </div>
             </nav>
         </header>
