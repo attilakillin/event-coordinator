@@ -1,0 +1,84 @@
+# This properties file is attached to the Docker container as an
+# 'application.properties' file of the backend JAR file.
+
+spring:
+  # Set database access properties
+  datasource:
+    url: 'jdbc:mysql://auth-db:3306/administrators'
+    username: 'overseer'
+    password: 'overseer'
+
+# Set custom properties:
+application:
+  cross-origin: 'http://common-proxy:80'
+  jwt:
+    private-key: |
+      -----BEGIN PRIVATE KEY-----
+      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
+      3B15ehAESW5FnXgajbTJ6KdqkNtr
+      -----END PRIVATE KEY-----
+
+    public-key: |
+      -----BEGIN PUBLIC KEY-----
+      MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAtFNhDuu8QDCSsosFN433
+      EnKxHrSlREt3/eYBKOXREbZwqvwhjgnLPpyRlRUocsbT97hU7kEncLhOVFQy3Qn4
+      hpHPTh2yACK5Dcm93VigulF0WfXb9QuPFXTeBtXxEyfn1FFiYI9SvxAm0bKsTH/R
+      ATrEHh+8INNXt2zAsdnJu8SKVcn7TAKv57G/0IZUNupYRkFQNKPoBBqVtH++Wmhj
+      v12mQpEjFxvh3E3bzW5Dfsp4wErJCiNTksRDk9AIVNLMuTxNiQcRsEnjWtNyt+pT
+      OcNbWDyaCaxAu3raKlg5jX5mACVKMmVwJOhUulCQqI7VUs5HCN9K4w5f73EQtQOv
+      fx8yeODR4PL5E+0nmKf7fU7EcNO3anwINCQ4jjl3wWYwpg4Jf9BUm9oj3wC6gJJs
+      M3rOUX73uQjcXwIXK+0sa6fViTh4oR9ws1ggaSG3q/9uaRzuw7lb9osaY5luTITI
+      kc9lFYfVDrhM6il/t/NGfL1K8h7+x4ZtZgf0Mi4fFj3m8ZWye+R7E6NCujoSm5Yc
+      sQI8t0ac5APyjD3CBCHmvfzfiMTib6hpnXdtCF6d1/1ige7BNO+Y624k6Eu1c3WW
+      mZSiLANz95rB/qe+lIB7f6RiLvvn0MSigpC9KYqOGmTMII1x9/sEd6vLH4BrTeq4
+      /NHAc+IAmb/kN2CpvE+k1T8CAwEAAQ==
+      -----END PUBLIC KEY-----
+    issuer: ''
