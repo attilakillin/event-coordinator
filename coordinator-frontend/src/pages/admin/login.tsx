@@ -2,7 +2,6 @@ import AppHead from "@/components/builtin/app_head";
 import Button from "@/components/builtin/button";
 import Navbar from "@/components/navbar";
 import { AuthService } from "@/services/auth-service";
-import Link from "next/link";
 import { useRouter } from "next/router";
 import { useState } from "react";
 import { toast } from "react-toastify";
@@ -36,9 +35,8 @@ export default function AdminLogin() {
                         <input className='block w-full text-lg placeholder:italic placeholder:text-stone-400 border border-stone-300 px-2 py-2'
                                type='password' value={password} onChange={e => setPassword(e.target.value)} />
                     </div>
-                    <div className='flex items-center justify-between'>
+                    <div className='flex justify-center'>
                         <Button primary onClick={handleLoginClick}>Bejelentkezés</Button>
-                        <Link href='/admin/register' className='text-stone-800'>Regisztráció</Link>
                     </div>
                 </div>
             </div>

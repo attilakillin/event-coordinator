@@ -49,15 +49,5 @@ services:
                 config: docker.yml
         networks:
             - internal
-    auth-db:
-        container_name: auth-db
-        image: mysql:8.0
-        environment:
-            MYSQL_DATABASE: "administrators"
-            MYSQL_ROOT_PASSWORD: ${AUTH_DB_ROOT_PASSWORD}
-            MYSQL_USER: ${AUTH_DB_USER}
-            MYSQL_PASSWORD: ${AUTH_DB_PASS}
-        networks:
-            - internal
 networks:
     internal:

@@ -5,7 +5,6 @@ import hu.attilakillin.coordinatorauthbackend.dal.Administrator
 import hu.attilakillin.coordinatorauthbackend.dal.AdministratorRepository
 import io.jsonwebtoken.JwtException
 import io.jsonwebtoken.Jwts
-import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import java.security.KeyFactory
 import java.security.PrivateKey
@@ -47,6 +46,7 @@ class JwtService(
             .setNotBefore(Date.from(now))
             .setExpiration(Date.from(now.plusSeconds(lifespan)))
             .setIssuer(configuration.jwt.issuer)
+            .setSubject(user.username)
             .signWith(privateKey)
             .compact()
     }
@@ -63,6 +63,8 @@ class JwtService(
 
         val now = Date.from(Instant.now())
 
-        return claims.body.notBefore.before(now) && claims.body.expiration.after(now)
+        return claims.body.notBefore.before(now)
+            && claims.body.expiration.after(now)
+            && repository.existsByUsername(claims.body.subject)
     }
 }

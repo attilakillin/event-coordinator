@@ -15,17 +15,6 @@ import org.springframework.web.bind.annotation.RestController
 class AdministratorController(
     private val service: AdministratorService
 ) {
-    @PostMapping("/register")
-    fun register(@RequestBody credentials: AdministratorDTO): ResponseEntity<JwtDTO> {
-        val admin = service.saveAdministrator(credentials)
-            ?: return ResponseEntity.badRequest().build()
-
-        val token = service.createTokenFor(admin)
-            ?: return ResponseEntity.badRequest().build()
-
-        return ResponseEntity.ok(JwtDTO(token))
-    }
-
     @PostMapping("/login")
     fun login(@RequestBody credentials: AdministratorDTO): ResponseEntity<JwtDTO> {
         val admin = service.findAdministrator(credentials)

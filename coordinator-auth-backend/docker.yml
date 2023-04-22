@@ -1,16 +1,14 @@
 # This properties file is attached to the Docker container as an
 # 'application.properties' file of the backend JAR file.
 
-spring:
-  # Set database access properties
-  datasource:
-    url: 'jdbc:mysql://auth-db:3306/administrators'
-    username: 'overseer'
-    password: 'overseer'
-
 # Set custom properties:
 application:
   cross-origin: 'http://common-proxy:80'
+  admins:
+    - username: 'admin'
+      password: '$2a$10$V.UG.7NEbPzvm0WG1EB9v.pvYOHLd7y6u.oQqPpQw.s4IdaJ4t68q'
+    - username: 'jack'
+      password: '$2a$10$NwJPnVsUvB13PZeN7XVLCe0AwEeQDSQOj4cZHMhD3DqYCBm0rL/iG'
   jwt:
     private-key: |
       -----BEGIN PRIVATE KEY-----
@@ -81,4 +79,4 @@ application:
       mZSiLANz95rB/qe+lIB7f6RiLvvn0MSigpC9KYqOGmTMII1x9/sEd6vLH4BrTeq4
       /NHAc+IAmb/kN2CpvE+k1T8CAwEAAQ==
       -----END PUBLIC KEY-----
-    issuer: ''
+    issuer: 'coordinator-auth-backend'

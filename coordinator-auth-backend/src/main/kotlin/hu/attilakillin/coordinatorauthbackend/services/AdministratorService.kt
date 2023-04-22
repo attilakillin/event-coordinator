@@ -12,17 +12,8 @@ class AdministratorService(
     private val passwordEncoder: PasswordEncoder,
     private val jwtService: JwtService
 ) {
-    fun saveAdministrator(admin: AdministratorDTO): Administrator? {
-        if (repository.existsByUsername(admin.username)) return null
-
-        return repository.save(Administrator(
-            username = admin.username,
-            password = passwordEncoder.encode(admin.password)
-        ))
-    }
-
     fun findAdministrator(admin: AdministratorDTO): Administrator? {
-        val candidate = repository.findByUsername(admin.username) ?: return null
+        val candidate = repository.findByUsernameOrNull(admin.username) ?: return null
 
         return if (passwordEncoder.matches(admin.password, candidate.password)) {
             candidate
@@ -32,7 +23,7 @@ class AdministratorService(
     }
 
     fun createTokenFor(admin: Administrator): String? {
-        if (!repository.existsById(admin.id)) return null
+        if (!repository.existsByUsername(admin.username)) return null
 
         return jwtService.createTokenFor(admin, 1800)
     }

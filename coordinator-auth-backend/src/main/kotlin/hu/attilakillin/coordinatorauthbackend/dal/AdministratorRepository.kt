@@ -1,10 +1,16 @@
 package hu.attilakillin.coordinatorauthbackend.dal
 
-import org.springframework.data.jpa.repository.JpaRepository
-import org.springframework.stereotype.Repository
+import hu.attilakillin.coordinatorauthbackend.configuration.PropertiesConfiguration
+import org.springframework.stereotype.Service
 
-@Repository
-interface AdministratorRepository : JpaRepository<Administrator, Long> {
-    fun existsByUsername(username: String): Boolean
-    fun findByUsername(username: String): Administrator?
+@Service
+class AdministratorRepository(
+    private val configuration: PropertiesConfiguration
+) {
+    fun existsByUsername(username: String): Boolean {
+        return configuration.admins.any { it.username == username }
+    }
+    fun findByUsernameOrNull(username: String): Administrator? {
+        return configuration.admins.find { it.username == username }
+    }
 }

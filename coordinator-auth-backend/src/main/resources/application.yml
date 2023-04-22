@@ -1,25 +1,9 @@
-spring:
-  # Set database settings
-  sql:
-    init:
-      mode: always
-  jpa:
-    hibernate:
-      ddl-auto: update
-    defer-datasource-initialization: true
-
-  # Set database access properties
-  datasource:
-    url: 'jdbc:mysql://localhost:3306/administrators'
-    username: 'user'
-    password: 'password'
-    driver-class-name: 'com.mysql.cj.jdbc.Driver'
-    hikari:
-      initialization-fail-timeout: 0
-
 # Set custom properties:
 application:
   cross-origin: 'http://localhost:3000'
+  admins:
+    - username: 'admin'
+      password: '{bcrypt}$2a$10$V.UG.7NEbPzvm0WG1EB9v.pvYOHLd7y6u.oQqPpQw.s4IdaJ4t68q'
   jwt:
     private-key: ''
     public-key: ''
