@@ -10,7 +10,10 @@ export namespace AuthService {
         })
             .then(r => (r.ok) ? r.json() : Promise.reject())
             .then(r => {
-                localStorage.setItem(id, r.token);
+                localStorage.setItem(id, JSON.stringify({
+                    token: r.token,
+                    checked: Math.floor(Date.now() / 1000)
+                }));
                 return r;
             });
     }
@@ -21,16 +24,24 @@ export namespace AuthService {
     }
 
     export function validate(): Promise<any> {
-        const token = localStorage.getItem(id);
+        const data = localStorage.getItem(id);
 
-        if (token === null) {
+        if (data === null) {
+            console.log('Rejected validate: no token');
             return Promise.reject();
         }
 
+        const token = JSON.parse(data);
+        if (Math.floor(Date.now() / 1000) - token.checked < 10) {
+            console.log('Resolved validate: recent check');
+            return Promise.resolve();
+        }
+
+        console.log('Revalidating');
         return fetch(url + '/validate', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ token: token })
+            body: JSON.stringify({ token: token.token })
         })
             .then(r => (r.ok) ? r.json() : Promise.reject())
             .then(r => {
@@ -38,6 +49,10 @@ export namespace AuthService {
                     localStorage.removeItem(id);
                     return Promise.reject();
                 } else {
+                    localStorage.setItem(id, JSON.stringify({
+                        token: token.token,
+                        checked: Math.floor(Date.now() / 1000)
+                    }));
                     return r;
                 }
             });
