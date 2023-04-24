@@ -1,9 +1,9 @@
 Dockerfile
 .dockerignore
 
-/.gradle
-/.idea
-/build
+.gradle/
+.idea/
+build/
 
-/.git
+.git/
 .gitignore

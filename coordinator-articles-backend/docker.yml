@@ -1,5 +1,8 @@
-# This properties file is attached to the Docker container as an
-# 'application.properties' file of the backend JAR file.
+# This properties file is attached to the Docker container
+# as an 'application.yml' file of the backend JAR file.
+# Configure runtime properties here.
+# Further default values are set in the 'application.yml' file
+# (found in the sources), which is bundled in the application JAR.
 
 # Set database access properties
 spring:
@@ -8,11 +11,12 @@ spring:
     username: 'overseer'
     password: 'overseer'
 
-# Set cross origin property: the frontend will make requests from this URL
+# Set authentication verification parameters.
 application:
-  cross-origin: 'http://common-proxy:80'
   auth:
-    public-key: |
+    allowed-issuers:
+      - 'coordinator-auth-backend'
+    rsa-public-key: |
       -----BEGIN PUBLIC KEY-----
       MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAtFNhDuu8QDCSsosFN433
       EnKxHrSlREt3/eYBKOXREbZwqvwhjgnLPpyRlRUocsbT97hU7kEncLhOVFQy3Qn4
@@ -27,4 +31,3 @@ application:
       mZSiLANz95rB/qe+lIB7f6RiLvvn0MSigpC9KYqOGmTMII1x9/sEd6vLH4BrTeq4
       /NHAc+IAmb/kN2CpvE+k1T8CAwEAAQ==
       -----END PUBLIC KEY-----
-    issuer: 'coordinator-auth-backend'

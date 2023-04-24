@@ -10,7 +10,7 @@ plugins {
 }
 
 group = "hu.attilakillin"
-version = "0.0.1-SNAPSHOT"
+version = "1.0.0"
 java.sourceCompatibility = JavaVersion.VERSION_17
 
 repositories {
@@ -18,15 +18,20 @@ repositories {
 }
 
 dependencies {
+	annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
+
 	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 	implementation("org.springframework.boot:spring-boot-starter-web")
+
 	implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
+	implementation("io.jsonwebtoken:jjwt-api:0.11.5")
 	implementation("org.jetbrains.kotlin:kotlin-reflect")
 	implementation ("org.jsoup:jsoup:1.15.4")
-	implementation("io.jsonwebtoken:jjwt-api:0.11.5")
+
+	runtimeOnly("com.mysql:mysql-connector-j")
 	runtimeOnly("io.jsonwebtoken:jjwt-impl:0.11.5")
 	runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.11.5")
-	runtimeOnly("com.mysql:mysql-connector-j")
+
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 }
 
