@@ -1,4 +1,4 @@
-package hu.attilakillin.coordinatorarticlesbackend
+package hu.attilakillin.coordinatorarticlesbackend.services
 
 import hu.attilakillin.coordinatorarticlesbackend.dal.Article
 import hu.attilakillin.coordinatorarticlesbackend.dal.ArticleRepository

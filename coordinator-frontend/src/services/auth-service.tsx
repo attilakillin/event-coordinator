@@ -23,21 +23,27 @@ export namespace AuthService {
         return Promise.resolve();
     }
 
+    export function getToken(): string | null {
+        const data = localStorage.getItem(id);
+
+        if (data === null) {
+            return null;
+        }
+        return JSON.parse(data).token;
+    }
+
     export function validate(): Promise<any> {
         const data = localStorage.getItem(id);
 
         if (data === null) {
-            console.log('Rejected validate: no token');
             return Promise.reject();
         }
 
         const token = JSON.parse(data);
         if (Math.floor(Date.now() / 1000) - token.checked < 10) {
-            console.log('Resolved validate: recent check');
             return Promise.resolve();
         }
 
-        console.log('Revalidating');
         return fetch(url + '/validate', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },

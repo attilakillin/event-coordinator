@@ -26,7 +26,7 @@ services:
         build:
             context: ./coordinator-articles-backend
             args:
-                config: docker.properties
+                config: docker.yml
         networks:
             - internal
     articles-db:

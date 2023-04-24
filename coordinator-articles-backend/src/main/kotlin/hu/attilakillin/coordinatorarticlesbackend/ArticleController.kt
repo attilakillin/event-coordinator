@@ -2,6 +2,9 @@ package hu.attilakillin.coordinatorarticlesbackend
 
 import hu.attilakillin.coordinatorarticlesbackend.dto.ArticleDTO
 import hu.attilakillin.coordinatorarticlesbackend.dto.ArticleSummaryDTO
+import hu.attilakillin.coordinatorarticlesbackend.services.ArticleService
+import hu.attilakillin.coordinatorarticlesbackend.services.JwtService
+import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.CrossOrigin
 import org.springframework.web.bind.annotation.DeleteMapping
@@ -10,6 +13,7 @@ import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestHeader
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder
@@ -17,7 +21,8 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder
 @RestController
 @CrossOrigin(origins = ["#{propertiesConfiguration.crossOrigin}"])
 class ArticleController(
-    private val service: ArticleService
+    private val service: ArticleService,
+    private val jwtService: JwtService
 ) {
 
     @GetMapping("/")
@@ -44,7 +49,10 @@ class ArticleController(
     }
 
     @PostMapping("/")
-    fun postArticle(@RequestBody article: ArticleDTO): ResponseEntity<Unit> {
+    fun postArticle(@RequestBody article: ArticleDTO, @RequestHeader("Auth-Token") token: String?): ResponseEntity<Unit> {
+        if (!jwtService.validateToken(token))
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build()
+
         val savedArticle = service.saveArticle(article)
 
         val uri = ServletUriComponentsBuilder
@@ -57,7 +65,10 @@ class ArticleController(
     }
 
     @PutMapping("/{id}")
-    fun postArticle(@PathVariable id: String, @RequestBody article: ArticleDTO): ResponseEntity<Unit> {
+    fun putArticle(@PathVariable id: String, @RequestBody article: ArticleDTO, @RequestHeader("Auth-Token") token: String?): ResponseEntity<Unit> {
+        if (!jwtService.validateToken(token))
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build()
+
         val parsedId = id.toLongOrNull()
             ?: return ResponseEntity.badRequest().build()
         service.updateArticle(parsedId, article)
@@ -67,7 +78,10 @@ class ArticleController(
     }
 
     @DeleteMapping("/{id}")
-    fun deleteArticle(@PathVariable id: String): ResponseEntity<Unit> {
+    fun deleteArticle(@PathVariable id: String, @RequestHeader("Auth-Token") token: String?): ResponseEntity<Unit> {
+        if (!jwtService.validateToken(token))
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build()
+
         val parsedId = id.toLongOrNull()
             ?: return ResponseEntity.badRequest().build()
 
