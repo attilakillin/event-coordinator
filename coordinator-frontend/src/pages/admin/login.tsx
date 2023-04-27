@@ -28,12 +28,14 @@ export default function AdminLogin() {
                     <div className='mb-4'>
                         <label className='block text-stone-800 mb-1'>Felhasználónév</label>
                         <input className='block w-full text-lg placeholder:italic placeholder:text-stone-400 border border-stone-300 px-2 py-2'
-                               type='text' value={username} onChange={e => setUsername(e.target.value)}/>
+                               type='text' value={username} onChange={e => setUsername(e.target.value)} autoFocus
+                               onKeyDown={e => (e.key === 'Enter') && document.getElementById('password')!.focus()} />
                     </div>
                     <div className='mb-6'>
                         <label className='block text-stone-800 mb-1'>Jelszó</label>
                         <input className='block w-full text-lg placeholder:italic placeholder:text-stone-400 border border-stone-300 px-2 py-2'
-                               type='password' value={password} onChange={e => setPassword(e.target.value)} />
+                               id='password' type='password' value={password} onChange={e => setPassword(e.target.value)}
+                               onKeyDown={e => (e.key === 'Enter') && handleLoginClick()} />
                     </div>
                     <div className='flex justify-center'>
                         <Button primary onClick={handleLoginClick}>Bejelentkezés</Button>

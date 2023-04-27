@@ -37,7 +37,7 @@ export default function Navbar() {
         <header>
             <nav className='flex items-center text-stone-800 bg-stone-100 text-lg px-4 py-5'>
                 <div className='ml-2 mr-6'>
-                    <span>Event Coordinator</span>
+                    <Link href='/'>Event Coordinator</Link>
                 </div>
                 <div className='mr-auto'>
                     {(loggedIn) ? mapLinks(basePathList.concat(authPathList)) : mapLinks(basePathList)}
