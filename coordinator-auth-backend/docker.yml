@@ -1,16 +1,20 @@
 # This properties file is attached to the Docker container as an
 # 'application.properties' file of the backend JAR file.
+# Configure runtime properties here.
+# Further default values may be set in the 'application.yml' file
+# (found in the sources), which is bundled in the application JAR.
 
-# Set custom properties:
 application:
-  cross-origin: 'http://common-proxy:80'
   admins:
+    # Set list of allowed administrator credentials.
     - username: 'admin'
       password: '$2a$10$V.UG.7NEbPzvm0WG1EB9v.pvYOHLd7y6u.oQqPpQw.s4IdaJ4t68q'
     - username: 'jack'
       password: '$2a$10$NwJPnVsUvB13PZeN7XVLCe0AwEeQDSQOj4cZHMhD3DqYCBm0rL/iG'
-  jwt:
-    private-key: |
+  # Set authentication signing and verifying parameters.
+  auth:
+    issuer: 'coordinator-auth-backend'
+    rsa-private-key: |
       -----BEGIN PRIVATE KEY-----
       MIIJQQIBADANBgkqhkiG9w0BAQEFAASCCSswggknAgEAAoICAQC0U2EO67xAMJKy
       iwU3jfcScrEetKVES3f95gEo5dERtnCq/CGOCcs+nJGVFShyxtP3uFTuQSdwuE5U
@@ -64,7 +68,7 @@ application:
       3B15ehAESW5FnXgajbTJ6KdqkNtr
       -----END PRIVATE KEY-----
 
-    public-key: |
+    rsa-public-key: |
       -----BEGIN PUBLIC KEY-----
       MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAtFNhDuu8QDCSsosFN433
       EnKxHrSlREt3/eYBKOXREbZwqvwhjgnLPpyRlRUocsbT97hU7kEncLhOVFQy3Qn4
@@ -79,4 +83,3 @@ application:
       mZSiLANz95rB/qe+lIB7f6RiLvvn0MSigpC9KYqOGmTMII1x9/sEd6vLH4BrTeq4
       /NHAc+IAmb/kN2CpvE+k1T8CAwEAAQ==
       -----END PUBLIC KEY-----
-    issuer: 'coordinator-auth-backend'

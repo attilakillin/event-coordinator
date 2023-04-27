@@ -1,6 +1,11 @@
 package hu.attilakillin.coordinatorauthbackend.dto
 
+/**
+ * A DTO class used for receiving the credentials of an administrator.
+ */
 data class AdministratorDTO(
-    val username: String,
-    val password: String
+    /** Username of the administrator. */
+    var username: String,
+    /** Password of the administrator. */
+    var password: String
 )

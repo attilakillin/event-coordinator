@@ -1,10 +1,15 @@
-# Set custom properties:
+# This properties file zero-initializes every runtime-specific
+# value. These must be overwritten (for example from an additional
+# properties file outside the runtime JAR) in order for the
+# application to perform properly and safely.
+
 application:
-  cross-origin: 'http://localhost:3000'
+  # Set list of allowed administrator credentials.
   admins:
-    - username: 'admin'
+    - username: 'admin'  # SAMPLE INITIALIZATION, configure properly.
       password: '{bcrypt}$2a$10$V.UG.7NEbPzvm0WG1EB9v.pvYOHLd7y6u.oQqPpQw.s4IdaJ4t68q'
-  jwt:
-    private-key: ''
-    public-key: ''
-    issuer: ''
+  # Set authentication signing and verifying parameters.
+  auth:
+    issuer: '' # ZERO INITIALIZED, configure properly.
+    rsa-private-key: '' # ZERO INITIALIZED, configure properly.
+    rsa-public-key: '' # ZERO INITIALIZED, configure properly.
