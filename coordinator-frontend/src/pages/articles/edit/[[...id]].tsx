@@ -18,16 +18,21 @@ export default function ArticlesCreate() {
     /* Initialize state management. */
     const [title, setTitle] = useState('');
     const [content, setContent] = useState('');
+    const [published, setPublished] = useState(false);
     const [isPreview, setIsPreview] = useState(false);
 
     /* If we are editing an already written article, load its content from the server. */
     useEffect(() => {
         if (typeof router.query.id !== 'undefined') {
             ArticleService.get(router.query.id![0])
-                .then(data => { setTitle(data.title); setContent(data.content); })
+                .then(data => {
+                    setTitle(data.title);
+                    setContent(data.content);
+                    setPublished(data.published);
+                })
                 .catch(_ => toast.error('Hiba történt: A cikk betöltése nem sikerült!'));
         }
-    }, [router.query.id]);
+    }, [router.query]);
 
     /* Preview button click handler. */
     const handlePreviewClick = () => {
@@ -36,13 +41,15 @@ export default function ArticlesCreate() {
 
     /* Dummy save button click handler. */
     const handleSaveClick = () => {
+        const target = (published) ? '/articles' : '/articles/drafts';
+
         if (typeof router.query.id !== 'undefined') {
             ArticleService.put(router.query.id![0], title, content)
-                .then(_ => router.push('/articles'))
+                .then(_ => router.push(target))
                 .catch(_ => toast.error('Hiba történt: A cikk mentése nem sikerült!'));
         } else {
             ArticleService.post(title, content)
-                .then(_ => router.push('/articles'))
+                .then(_ => router.push(target))
                 .catch(_ => toast.error('Hiba történt: A cikk mentése nem sikerült!'));
         }
     };
@@ -54,13 +61,18 @@ export default function ArticlesCreate() {
 
             ['bold', 'italic', 'underline'],
             [{'color': []}, {'background': []}],
-            ['link', 'image'],
+            ['link'],
             [{'list': 'ordered'}, {'list': 'bullet'}],
             ['blockquote', {'indent': '-1'}, {'indent': '+1'}],
 
             ['clean']
         ]
     };
+
+    const formats = [
+        'background', 'bold', 'color', 'font', 'italic', 'link', 'size', 'underline',
+        'blockquote', 'header', 'indent', 'list'
+    ];
 
     /* Generate page markup. */
     return (
@@ -85,7 +97,7 @@ export default function ArticlesCreate() {
                                placeholder='Bejegyzés címe...' />
                         <div className='h-4/5'> 
                             <ReactQuill theme='snow' className='h-full' value={content} modules={modules}
-                                        onChange={setContent} placeholder='Bejegyzés szövege...' />
+                                        onChange={setContent} formats={formats} placeholder='Bejegyzés szövege...' />
                         </div>
                     </div>
                 }

@@ -24,9 +24,6 @@ function QuillRenderer(props: ComponentProps) {
     /* Links have to be styled. */
     dom.querySelectorAll('a').forEach(e => e.classList.add('underline', 'text-stone-600'));
 
-    /* Images work out-of-the-box, but we add a bit of padding, just for show. */
-    dom.querySelectorAll('img').forEach(e => e.classList.add('px-2'));
-
     /* Lists just need one single class on their root element. */
     dom.querySelectorAll('ol').forEach(e => e.classList.add('list-decimal', 'pl-8'));
     dom.querySelectorAll('ul').forEach(e => e.classList.add('list-disc', 'pl-8'));

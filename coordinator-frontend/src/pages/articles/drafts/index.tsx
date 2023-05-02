@@ -7,12 +7,12 @@ import Button from '@/components/builtin/button';
 import { ArticleService } from '@/services/article-service';
 import { toast } from 'react-toastify';
 
-export default function ArticlesIndex() {
+export default function ArticlesDrafts() {
     const [articles, setArticles] = useState([]);
     const [keywords, setKeywords] = useState('');
 
     const handleSearchClick = () => {
-        ArticleService.searchPublished(keywords)
+        ArticleService.searchDrafts(keywords)
             .then(data => setArticles(data))
             .catch(_ => toast.error('Hiba történt: A cikkek betöltése nem sikerült!'));
     }
@@ -21,7 +21,7 @@ export default function ArticlesIndex() {
 
     const router = useRouter();
     const onClick = (id: number) => {
-        router.push('/articles/' + id);
+        router.push('/articles/drafts/' + id);
     };
 
     return (

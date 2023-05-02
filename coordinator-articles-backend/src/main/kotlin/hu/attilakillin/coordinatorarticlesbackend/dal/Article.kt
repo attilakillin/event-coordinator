@@ -1,9 +1,7 @@
 package hu.attilakillin.coordinatorarticlesbackend.dal
 
-import jakarta.persistence.Entity
-import jakarta.persistence.GeneratedValue
-import jakarta.persistence.GenerationType
-import jakarta.persistence.Id
+import jakarta.persistence.*
+import java.time.OffsetDateTime
 
 /**
  * The main domain specific entity of the application:
@@ -14,6 +12,12 @@ data class Article(
     /** Unique ID, used internally, not shown to the end user. */
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Long = 0,
+
+    /** The moment a draft article was created, or a published article published. */
+    var created: OffsetDateTime,
+    /** Whether the article is already published, or not. */
+    var published: Boolean = false,
+
     /** The title of the article. */
     var title: String,
     /** The main content of the article. Sanitized HTML code. */

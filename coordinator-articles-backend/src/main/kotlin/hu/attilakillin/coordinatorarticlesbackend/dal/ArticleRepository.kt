@@ -16,7 +16,25 @@ interface ArticleRepository : JpaRepository<Article, Long> {
     /**
      * Return a page of all articles that match on the specified keywords
      * either in their title or in their text field.
+     * Based on the published flag, returns either a list of published, or a list
+     * of draft articles in descending order of their creation.
      */
-    @Query(value = "SELECT * FROM articles WHERE MATCH(title, text) AGAINST(?1)", nativeQuery = true)
-    fun searchArticles(keywords: String, pageable: Pageable): Page<Article>
+    @Query(value = """
+        SELECT * FROM articles
+        WHERE MATCH(title, text) AGAINST(?1) AND published = ?2
+        ORDER BY created DESC
+    """, nativeQuery = true)
+    fun searchArticlesByPublication(keywords: String, published: Boolean, pageable: Pageable): Page<Article>
+
+    /**
+     * Return a page of all articles.
+     * Based on the published flag, returns either a list of published, or a list
+     * of draft articles in descending order of their creation.
+     */
+    @Query(value = """
+        SELECT * FROM articles
+        WHERE published = ?1
+        ORDER BY created DESC
+    """, nativeQuery = true)
+    fun findAllArticlesByPublication(published: Boolean): List<Article>
 }

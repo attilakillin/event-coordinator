@@ -2,12 +2,13 @@ package hu.attilakillin.coordinatorarticlesbackend.services
 
 import hu.attilakillin.coordinatorarticlesbackend.dal.Article
 import hu.attilakillin.coordinatorarticlesbackend.dal.ArticleRepository
-import hu.attilakillin.coordinatorarticlesbackend.dto.ArticleDTO
+import hu.attilakillin.coordinatorarticlesbackend.dto.ArticleRequestDTO
 import org.jsoup.Jsoup
 import org.jsoup.safety.Safelist
 import org.springframework.data.domain.Pageable
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
+import java.time.OffsetDateTime
 
 /**
  * Performs tasks related to article persistence and manipulation.
@@ -21,9 +22,9 @@ class ArticleService(
      * HTML sanitization function. Sanitizes the HTML content from an
      * article and creates an article object with the resulting clean content.
      */
-    private fun sanitizeDTO(dto: ArticleDTO): Article {
+    private fun sanitizeDTO(dto: ArticleRequestDTO): Article {
         /* Custom sanitizer that allows additional tags created by the frontend editor. */
-        val sanitizer = Safelist.basicWithImages()
+        val sanitizer = Safelist.basic()
             .addAttributes("span", "style", "class")
             .addAttributes("h1", "class")
             .addAttributes("h2", "class")
@@ -32,7 +33,12 @@ class ArticleService(
         val cleanContent = Jsoup.clean(dto.content, sanitizer)
         val cleanText = Jsoup.parse(cleanContent).wholeText()
 
+        val created = OffsetDateTime.now()
+
         return Article(
+            created = created,
+            published = false,
+
             title = dto.title,
             content = cleanContent,
             text = cleanText
@@ -56,7 +62,7 @@ class ArticleService(
      * Saves article and returns the saved entity. If the article had empty
      * fields after sanitization, it isn't saved, and null is returned.
      */
-    fun saveArticle(dto: ArticleDTO): Article? {
+    fun saveArticle(dto: ArticleRequestDTO): Article? {
         val article = sanitizeDTO(dto)
 
         return checkThenSaveArticle(article)
@@ -66,12 +72,15 @@ class ArticleService(
      * Updates article and returns the updated entity. If the given ID is invalid, or the
      * article had empty fields after sanitization, it isn't saved, and null is returned.
      */
-    fun updateArticle(id: Long, dto: ArticleDTO): Article? {
-        if(!repository.existsById(id)) {
-            return null
-        }
+    fun updateArticle(id: Long, dto: ArticleRequestDTO): Article? {
+        val original = repository.findByIdOrNull(id)
+            ?: return null
 
-        val article = sanitizeDTO(dto).also { it.id = id }
+        val article = sanitizeDTO(dto).also {
+            it.id = original.id
+            it.created = original.created
+            it.published = original.published
+        }
 
         return checkThenSaveArticle(article)
     }
@@ -85,15 +94,28 @@ class ArticleService(
     }
 
     /**
-     * Searches the articles by the given keywords as a search query.
-     * If the keywords string is empty or null, returns every article.
+     * Publishes an already saved article. If the given ID is invalid, null is returned.
      */
-    fun searchArticles(keywords: String?): List<Article> {
+    fun publishArticle(id: Long): Article? {
+        val article = repository.findByIdOrNull(id) ?: return null
+
+        article.published = true
+        article.created = OffsetDateTime.now()
+
+        return repository.save(article)
+    }
+
+    /**
+     * Searches articles by the given keywords as a search query.
+     * Searches the list of published, or draft articles, based on the published parameter.
+     * If the keywords string is empty or null, returns every published/draft article.
+     */
+    fun searchArticles(keywords: String?, published: Boolean): List<Article> {
         if (keywords.isNullOrBlank()) {
-            return repository.findAll()
+            return repository.findAllArticlesByPublication(published)
         }
 
-        return repository.searchArticles(keywords, Pageable.unpaged()).content
+        return repository.searchArticlesByPublication(keywords, published, Pageable.unpaged()).content
     }
 
     /**

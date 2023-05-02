@@ -10,6 +10,7 @@ const basePathList = [
 ];
 
 const authPathList = [
+    { name: 'Piszkozatok', path: '/articles/drafts' },
     { name: 'Új bejegyzés', path: '/articles/edit' }
 ];
 
