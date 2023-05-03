@@ -1,4 +1,5 @@
-# Main configuration script for application deployment
+# Main configuration script for application deployment.
+# Configure variables (such as build method) in the .env file.
 
 services:
     # Common frontend
@@ -6,6 +7,7 @@ services:
         container_name: common-frontend
         build:
             context: ./coordinator-frontend
+            dockerfile: 'Dockerfile-${BUILD_PHASE_LOCATION}'
         networks:
             - internal
 
@@ -25,6 +27,7 @@ services:
         container_name: articles-backend
         build:
             context: ./coordinator-articles-backend
+            dockerfile: 'Dockerfile-${BUILD_PHASE_LOCATION}'
             args:
                 config: docker.yml
         networks:
@@ -45,6 +48,7 @@ services:
         container_name: auth-backend
         build:
             context: ./coordinator-auth-backend
+            dockerfile: 'Dockerfile-${BUILD_PHASE_LOCATION}'
             args:
                 config: docker.yml
         networks:

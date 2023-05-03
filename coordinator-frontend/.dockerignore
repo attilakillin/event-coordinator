@@ -1,8 +1,10 @@
 Dockerfile
 .dockerignore
 
-/node_modules
-/.next
+node_modules/
+.next/
+!.next/standalone
+!.next/static
 
-/.git
+.git/
 .gitignore

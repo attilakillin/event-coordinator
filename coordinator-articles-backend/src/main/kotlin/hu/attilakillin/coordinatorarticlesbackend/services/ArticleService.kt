@@ -97,7 +97,10 @@ class ArticleService(
      * Publishes an already saved article. If the given ID is invalid, null is returned.
      */
     fun publishArticle(id: Long): Article? {
-        val article = repository.findByIdOrNull(id) ?: return null
+        val article = repository.findByIdOrNull(id)
+
+        if (article == null || article.published)
+            return null
 
         article.published = true
         article.created = OffsetDateTime.now()
