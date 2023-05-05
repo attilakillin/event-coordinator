@@ -1,4 +1,4 @@
-import { AuthService } from "./auth-service";
+import { AuthenticationService } from "./auth-service";
 
 export namespace ArticleService {
     const url = process.env.NEXT_PUBLIC_BACKEND_URL! + '/api/articles';
@@ -9,7 +9,7 @@ export namespace ArticleService {
     }
 
     export function searchDrafts(keywords: string): Promise<any> {
-        const token = AuthService.getToken()
+        const token = AuthenticationService.getToken()
         if (token === null) {
             return Promise.reject();
         }
@@ -24,7 +24,7 @@ export namespace ArticleService {
     }
 
     export function get(id: string): Promise<any> {
-        const token = AuthService.getToken();
+        const token = AuthenticationService.getToken();
         
         return fetch(url + '/administer/' + id, {
             method: 'GET',
@@ -36,7 +36,7 @@ export namespace ArticleService {
     }
 
     export function publish(id: String): Promise<any> {
-        const token = AuthService.getToken()
+        const token = AuthenticationService.getToken()
         if (token === null) {
             return Promise.reject();
         }
@@ -51,7 +51,7 @@ export namespace ArticleService {
     }
 
     export function post(title: string, content: string): Promise<any> {
-        const token = AuthService.getToken()
+        const token = AuthenticationService.getToken()
         if (token === null) {
             return Promise.reject();
         }
@@ -68,7 +68,7 @@ export namespace ArticleService {
     }
 
     export function put(id: string, title: string, content: string): Promise<any> {
-        const token = AuthService.getToken()
+        const token = AuthenticationService.getToken()
         if (token === null) {
             return Promise.reject();
         }
@@ -85,7 +85,7 @@ export namespace ArticleService {
     }
 
     export function remove(id: string): Promise<any> {
-        const token = AuthService.getToken()
+        const token = AuthenticationService.getToken()
         if (token === null) {
             return Promise.reject();
         }

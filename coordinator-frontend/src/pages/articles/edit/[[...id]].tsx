@@ -1,61 +1,22 @@
-import Navbar from '@/components/navbar';
-import QuillRenderer from '@/components/articles/quill-renderer';
+import Navbar from '@/components/blocks/navbar';
+import QuillRenderer from '@/components/blocks/articles/quill-renderer';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import 'react-quill/dist/quill.snow.css';
 import Button from '@/components/builtin/button';
-import AppHead from '@/components/builtin/app_head';
-import { ArticleService } from '@/services/article-service';
+import { ArticleService } from '@/lib/services/article-service';
 import { toast } from 'react-toastify';
+import AuthenticatedFrame from '@/components/frames/authenticated-frame';
+import Input from '@/components/builtin/input';
+import BasicFrame from '@/components/frames/basic-frame';
 
-/* QuillJS has to be loaded client-side, we can't render it on the server. */
+// Import QuillJS without server-side rendering.
 const ReactQuill = dynamic(() => import('react-quill'), { ssr: false });
 
-export default function ArticlesCreate() {
-    const router = useRouter();
-
-    /* Initialize state management. */
-    const [title, setTitle] = useState('');
-    const [content, setContent] = useState('');
-    const [published, setPublished] = useState(false);
-    const [isPreview, setIsPreview] = useState(false);
-
-    /* If we are editing an already written article, load its content from the server. */
-    useEffect(() => {
-        if (typeof router.query.id !== 'undefined') {
-            ArticleService.get(router.query.id![0])
-                .then(data => {
-                    setTitle(data.title);
-                    setContent(data.content);
-                    setPublished(data.published);
-                })
-                .catch(_ => toast.error('Hiba történt: A cikk betöltése nem sikerült!'));
-        }
-    }, [router.query]);
-
-    /* Preview button click handler. */
-    const handlePreviewClick = () => {
-        setIsPreview(value => !value);
-    };
-
-    /* Dummy save button click handler. */
-    const handleSaveClick = () => {
-        const target = (published) ? '/articles' : '/articles/drafts';
-
-        if (typeof router.query.id !== 'undefined') {
-            ArticleService.put(router.query.id![0], title, content)
-                .then(_ => router.push(target))
-                .catch(_ => toast.error('Hiba történt: A cikk mentése nem sikerült!'));
-        } else {
-            ArticleService.post(title, content)
-                .then(_ => router.push(target))
-                .catch(_ => toast.error('Hiba történt: A cikk mentése nem sikerült!'));
-        }
-    };
-
-    /* Customize QuillJS toolbar module. */
-    const modules = {
+// Customize QuillJS appearance and behaviour.
+const quillOptions = {
+    modules: {
         toolbar: [
             [{'header': 1}, {'header': 2}, {'font': []}],
 
@@ -67,48 +28,103 @@ export default function ArticlesCreate() {
 
             ['clean']
         ]
-    };
-
-    const formats = [
+    },
+    formats: [
         'background', 'bold', 'color', 'font', 'italic', 'link', 'size', 'underline',
         'blockquote', 'header', 'indent', 'list'
-    ];
+    ]
+};
 
-    /* Generate page markup. */
+/**
+ * Displays the main page for article editing and creation. If the path URL contains an ID,
+ * then the save action is interpreted as an update request, else as a save request.
+ * 
+ * Requires authentication.
+ */
+export default function ArticleCreate() {
+    const router = useRouter();
+
+    // Initialize state management.
+    const [title, setTitle] = useState('');
+    const [content, setContent] = useState('');
+    const [published, setPublished] = useState(false);
+    const [isPreview, setIsPreview] = useState(false);
+
+    // Find out whether we're updating or creating an article.
+    const [updating, setUpdating] = useState(false);
+    useEffect(() => {
+        setUpdating(typeof router.query.id !== 'undefined');
+    }, [router.query]);
+
+    // If we are editing an already written article, we need to load its content from the server.
+    useEffect(() => {
+        if (!updating) return;
+        
+        ArticleService.get(router.query.id![0])
+            .then(data => {
+                setTitle(data.title);
+                setContent(data.content);
+                setPublished(data.published);
+            })
+            .catch(() => toast.error('Hiba történt: A cikk betöltése nem sikerült!'));
+    }, [updating, router.query.id]);
+
+    // Preview button click handler.
+    const handlePreviewClick = () => setIsPreview(value => !value);
+
+    // Save button click handler. Can handle both save- and update requests.
+    const handleSaveClick = () => {
+        const target = (published) ? '/articles' : '/articles/drafts';
+
+        const request = (updating)
+            ? ArticleService.put(router.query.id![0], title, content)
+            : ArticleService.post(title, content);
+
+        request
+            .then(() => {
+                toast.success('Sikeres mentés!');
+                router.push(target);
+            })
+            .catch(() => {
+                toast.error(<div>A cikk mentése nem sikerült!<br />A cím és a szöveg mezők nem lehetnek üresek!</div>);
+            });
+    };
+
+    // Generate page layout.
     return (
-        <>
-            <AppHead title='Új bejegyzés - Coordinator' />
-            <Navbar />
+        <AuthenticatedFrame title='Bejegyzés szerkesztése'>
+            <div className='flex-1 container mx-auto px-4 flex flex-col'>
+                <h1 className='mt-6 mb-4 text-2xl text-theme-800'>Új bejegyzés</h1>
 
-            <div className='flex-1 container mx-auto px-4'>
-                <h1 className='text-stone-800 text-2xl mt-6 mb-4'>Új bejegyzés</h1>
+                <div className='mb-2'>
+                    {
+                        isPreview
+                        ? <h1 className='text-theme-800 text-xl'>{title}</h1>
+                        : <Input className='w-full' values={[title, setTitle]} placeholder='Bejegyzés címe...' />
+                    }
+                </div>
 
-                {
-                    isPreview
-                    ? <div className='h-1/2'>
-                        <h1 className='text-stone-800 text-xl mt-6 mb-2'>{title}</h1>
-                        <div className='h-4/5 overflow-auto'>
-                            <QuillRenderer content={content} />
-                        </div>
+                <div className='flex-1 flex flex-col'>
+                    <div className='flex-1'>
+                        {
+                            isPreview
+                            ? <QuillRenderer content={content} />
+                            : <ReactQuill
+                                theme='snow' className='h-full' placeholder='Bejegyzés szövege...'
+                                modules={quillOptions.modules} formats={quillOptions.formats}
+                                value={content} onChange={setContent}
+                            />
+                        }
                     </div>
-                    : <div className='h-1/2'>
-                        <input type='text' className='border border-stone-300 block w-full px-4 py-1 mb-2'
-                               value={title} onChange={e => setTitle(e.target.value)}
-                               placeholder='Bejegyzés címe...' />
-                        <div className='h-4/5'> 
-                            <ReactQuill theme='snow' className='h-full' value={content} modules={modules}
-                                        onChange={setContent} formats={formats} placeholder='Bejegyzés szövege...' />
-                        </div>
-                    </div>
-                }
 
-                <div className='flex justify-end mt-14 mb-4'>
-                    <Button onClick={handlePreviewClick} className='mr-4'>
-                        {isPreview ? 'Szerkesztés' : 'Előnézet'}
-                    </Button>
-                    <Button onClick={handleSaveClick} primary>Mentés</Button>
+                    <div className='flex justify-end mt-14 mb-4'>
+                        <Button onClick={handlePreviewClick} className='mr-4'>
+                            {isPreview ? 'Szerkesztés' : 'Előnézet'}
+                        </Button>
+                        <Button onClick={handleSaveClick} primary>Mentés</Button>
+                    </div>
                 </div>
             </div>
-        </>
+        </AuthenticatedFrame>
     );
 }

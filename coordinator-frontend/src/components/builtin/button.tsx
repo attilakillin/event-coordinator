@@ -1,21 +1,26 @@
 import { MouseEventHandler } from "react";
 
-interface Props {
+interface ComponentProps {
+    /** Whether the button is a primary button or not. Results in different styles. */
     primary?: boolean,
-    onClick?: MouseEventHandler<HTMLButtonElement>,
+    /** Specify additional styles here. */
     className?: string,
+    /** Click handler for the button. The callback will be delegated to the wrapped HTML button element. */
+    onClick?: MouseEventHandler<HTMLButtonElement>,
+    /** HTML elements that should be wrapped. Generally a line of text. */
     children?: React.ReactNode
 };
 
 /**
  * A pre-styled button component to reduce style duplication in the code base.
  * Margins are not added by default, but can be specified as additional classes.
+ * 
+ * Use the prop 'primary' to highlight the button as a primary button.
  */
-export default function Button(props: Props) {
-    /* Conditionally set styles. */
-    let styles = 'hover:outline hover:outline-3 hover:outline-stone-800 px-8 py-3 text-lg ';
-    styles += (props.primary) ? 'text-stone-100 bg-stone-800 ' : 'text-stone-800 ';
-    styles += (props.className) ? props.className : '';
+export default function Button(props: ComponentProps) {
+    const styles = 'text-lg px-8 py-3 hover:outline hover:outline-3 hover:outline-theme-800 '
+        + (props.primary ? 'text-theme-100 bg-theme-800 ' : 'text-theme-800 ')
+        + (props.className ? props.className : '');
 
     return <button className={styles} onClick={props.onClick}>{props.children}</button>;
-}
+};

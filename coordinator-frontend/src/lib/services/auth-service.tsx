@@ -1,4 +1,4 @@
-export namespace AuthService {
+export namespace AuthenticationService {
     const url = process.env.NEXT_PUBLIC_BACKEND_URL! + '/api/auth';
     const id = 'auth-token';
 
@@ -12,6 +12,7 @@ export namespace AuthService {
             .then(r => {
                 localStorage.setItem(id, JSON.stringify({
                     token: r.token,
+                    username: username,
                     checked: Math.floor(Date.now() / 1000)
                 }));
                 return r;

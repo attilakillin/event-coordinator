@@ -1,17 +1,9 @@
-import Navbar from '@/components/navbar';
-import Head from 'next/head';
 
+import CenteredFrame from '@/components/frames/centered-frame';
+
+/**
+ * Renders the home page of the application.
+ */
 export default function Index() {
-    return (
-        <>
-            <Head>
-                <title>Coordinator</title>
-                <meta name='viewport' content='width=device-width, initial-scale=1' />
-            </Head>
-            <Navbar />
-            <div className='flex-1 w-full flex items-center justify-center'>
-                <div>Index</div>
-            </div>
-        </>
-    );
+    return <CenteredFrame title='Kezdőlap'>Kezdőlap</CenteredFrame>;
 }
