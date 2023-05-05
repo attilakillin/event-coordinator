@@ -1,4 +1,3 @@
-
 import CenteredFrame from '@/components/frames/centered-frame';
 
 /**

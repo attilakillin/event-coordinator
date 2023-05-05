@@ -3,7 +3,7 @@ export default interface ArticleSummary {
     id: number,
 
     /** The moment a draft article was created, or a published article published. */
-    created: Date,
+    created: string,
     /** Whether the article is already published, or not. */
     published: boolean,
 

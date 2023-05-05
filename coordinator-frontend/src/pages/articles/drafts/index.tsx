@@ -10,7 +10,10 @@ import { ArticleListContent } from "@/pages/articles";
 export default function ArticleDraftIndex() {
     return <>
         <AuthenticatedFrame title='Piszkozatok'>
-            <ArticleListContent source={ArticleService.searchDrafts} />
+            <ArticleListContent
+                source={ArticleService.searchDrafts}
+                paths={(id: number) => `/articles/drafts/${id}`}
+            />
         </AuthenticatedFrame>
     </>;
 };

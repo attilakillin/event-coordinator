@@ -1,4 +1,3 @@
-import Navbar from '@/components/blocks/navbar';
 import QuillRenderer from '@/components/blocks/articles/quill-renderer';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
@@ -9,7 +8,6 @@ import { ArticleService } from '@/lib/services/article-service';
 import { toast } from 'react-toastify';
 import AuthenticatedFrame from '@/components/frames/authenticated-frame';
 import Input from '@/components/builtin/input';
-import BasicFrame from '@/components/frames/basic-frame';
 
 // Import QuillJS without server-side rendering.
 const ReactQuill = dynamic(() => import('react-quill'), { ssr: false });
@@ -86,7 +84,7 @@ export default function ArticleCreate() {
                 router.push(target);
             })
             .catch(() => {
-                toast.error(<div>A cikk mentése nem sikerült!<br />A cím és a szöveg mezők nem lehetnek üresek!</div>);
+                toast.error(<div>A cikk mentése nem sikerült!</div>);
             });
     };
 

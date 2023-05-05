@@ -1,8 +1,6 @@
-import Navbar from '@/components/blocks/navbar';
 import ArticleCard from '@/components/blocks/articles/article-card';
 import { useRouter } from 'next/router';
 import { useCallback, useEffect, useState } from 'react';
-import AppHead from '@/components/builtin/app-head';
 import Button from '@/components/builtin/button';
 import { ArticleService } from '@/lib/services/article-service';
 import { toast } from 'react-toastify';
@@ -11,7 +9,9 @@ import BasicFrame from '@/components/frames/basic-frame';
 
 interface ComponentProps {
     /** The source to be used for populating the list view. */
-    source: (query: string) => Promise<any>
+    source: (query: string) => Promise<any>,
+    /** The path where the user should be redirected to when clicking on an article. */
+    paths: (id: number) => string
 }
 
 /**
@@ -38,7 +38,7 @@ export function ArticleListContent(props: ComponentProps) {
 
     // Handle article card clicks.
     const router = useRouter();
-    const onClick = (id: number) => router.push(`/articles/${id}`);
+    const onClick = (id: number) => router.push(props.paths(id));
 
     // Return page content.
     return <>
@@ -64,7 +64,10 @@ export function ArticleListContent(props: ComponentProps) {
 export default function ArticleIndex() {
     return <>
         <BasicFrame title='Hírek'>
-            <ArticleListContent source={ArticleService.searchPublished} />
+            <ArticleListContent
+                source={ArticleService.searchPublished}
+                paths={(id: number) => `/articles/${id}`}
+            />
         </BasicFrame>
     </>;
 }

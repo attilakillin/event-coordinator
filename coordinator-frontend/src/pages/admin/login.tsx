@@ -1,11 +1,10 @@
-import AppHead from "@/components/builtin/app-head";
 import Button from "@/components/builtin/button";
-import Navbar from "@/components/blocks/navbar";
 import { AuthenticationService } from "@/lib/services/auth-service";
 import { useRouter } from "next/router";
 import { useState } from "react";
 import { toast } from "react-toastify";
 import Input from "@/components/builtin/input";
+import CenteredFrame from "@/components/frames/centered-frame";
 
 /**
  * Display the administrator login screen. The user can authenticate themselves.
@@ -33,11 +32,8 @@ export default function AdminLogin() {
     };
 
     // Generate rendered page.
-    return <>
-        <AppHead title='Bejelentkezés - Esemény koordinátor' />
-        <Navbar />
-
-        <div className='flex-1 mx-auto container flex items-center justify-center'>
+    return (
+        <CenteredFrame title='Bejelentkezés'>
             <div className='bg-theme-100 p-8'>
                 <div className='mb-4'>
                     <label className={labelStyles} htmlFor='username'>Felhasználónév</label>
@@ -57,6 +53,6 @@ export default function AdminLogin() {
                     <Button primary onClick={handleLoginClick}>Bejelentkezés</Button>
                 </div>
             </div>
-        </div>
-    </>;
+        </CenteredFrame>
+    );
 };
