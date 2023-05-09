@@ -3,6 +3,7 @@ package hu.attilakillin.coordinatorauthbackend.services
 import hu.attilakillin.coordinatorauthbackend.dal.Administrator
 import hu.attilakillin.coordinatorauthbackend.dal.AdministratorRepository
 import hu.attilakillin.coordinatorauthbackend.dto.AdministratorDTO
+import io.jsonwebtoken.Claims
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 
@@ -33,16 +34,14 @@ class AdministratorService(
     /**
      * Create a token for the given administrator.
      */
-    fun createTokenFor(admin: Administrator): String? {
-        if (!repository.existsByUsername(admin.username)) return null
-
+    fun createTokenFor(admin: Administrator): String {
         return authService.createTokenFor(admin, 1800)
     }
 
     /**
      * Validate an encoded JSON Web Token.
      */
-    fun validateToken(token: String): Boolean {
+    fun validateToken(token: String): Pair<Boolean, Claims?> {
         return authService.validateToken(token)
     }
 }

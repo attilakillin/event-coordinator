@@ -3,6 +3,7 @@ package hu.attilakillin.coordinatorauthbackend.services
 import hu.attilakillin.coordinatorauthbackend.configuration.PropertiesConfiguration
 import hu.attilakillin.coordinatorauthbackend.dal.Administrator
 import hu.attilakillin.coordinatorauthbackend.dal.AdministratorRepository
+import io.jsonwebtoken.Claims
 import io.jsonwebtoken.JwtException
 import io.jsonwebtoken.Jwts
 import org.springframework.stereotype.Service
@@ -71,23 +72,27 @@ class AuthService(
      * Validates A JSON Web Token. The token is valid if the timestamp are correct, the token
      * hasn't expired yet, the issuer matches, and an administrator with the given username
      * exists.
+     *
+     * If the token could be parsed, the method returns the contained claims as well.
      */
-    fun validateToken(token: String): Boolean {
+    fun validateToken(token: String): Pair<Boolean, Claims?> {
         val claims = try {
             Jwts.parserBuilder()
                 .setSigningKey(publicKey)
                 .build()
                 .parseClaimsJws(token)
         } catch (ex: JwtException) {
-            return false
+            return Pair(false, null)
         }
 
         val now = Date.from(Instant.now())
 
-        return claims.body.issuedAt.before(now)
+        val valid = claims.body.issuedAt.before(now)
             && claims.body.notBefore.before(now)
             && claims.body.expiration.after(now)
             && claims.body.issuer.equals(configuration.auth.issuer)
             && repository.existsByUsername(claims.body.subject)
+
+        return Pair(valid, claims.body)
     }
 }

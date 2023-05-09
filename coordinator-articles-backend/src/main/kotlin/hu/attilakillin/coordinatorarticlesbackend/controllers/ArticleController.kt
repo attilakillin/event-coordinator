@@ -3,6 +3,8 @@ package hu.attilakillin.coordinatorarticlesbackend.controllers
 import hu.attilakillin.coordinatorarticlesbackend.dto.*
 import hu.attilakillin.coordinatorarticlesbackend.services.ArticleService
 import hu.attilakillin.coordinatorarticlesbackend.services.AuthService
+import jakarta.servlet.http.HttpServletRequest
+import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.CrossOrigin
@@ -23,6 +25,30 @@ class ArticleController(
     private val articleService: ArticleService,
     private val authService: AuthService
 ) {
+    private val logger = LoggerFactory.getLogger(this.javaClass)
+    private val messages = object {
+        val failedToken = "Token verification failed: (IP: '{}', requested path: '{}', method: '{}')"
+        val passedToken = "Token validated: (subject: '{}', IP: '{}', valid: '{}', requested  path: '{}', method: '{}')"
+        val createdArticle = "Created article: (id: '{}', subject: '{}', IP '{}')"
+        val updatedArticle = "Updated article: (id: '{}', subject: '{}', IP '{}')"
+        val deletedArticle = "Deleted article: (id: '{}', subject: '{}', IP '{}')"
+        val publishedArticle = "Published article: (id: '{}', subject: '{}', IP '{}')"
+    }
+
+    /**
+     * Authenticate with the given token, and return the subject of the valid token as a string,
+     * or return null otherwise.
+     */
+    private fun authenticateAndGetSubject(token: String?, req: HttpServletRequest): String? {
+        val (valid, claims) = authService.isTokenValid(token)
+        if (claims == null) {
+            logger.info(messages.failedToken, req.remoteAddr, req.requestURI, req.method)
+        } else {
+            logger.info(messages.passedToken, claims.subject, req.remoteAddr, valid, req.requestURI, req.method)
+        }
+
+        return if (valid) claims?.subject else null
+    }
 
     /**
      * Search articles by the specified keywords and return a list of summaries.
@@ -49,10 +75,12 @@ class ArticleController(
     @GetMapping("/drafts")
     fun searchDraftArticles(
         @RequestHeader("Auth-Token") token: String?,
-        @RequestParam keywords: String?
+        @RequestParam keywords: String?,
+        req: HttpServletRequest
     ): ResponseEntity<List<ArticleSummaryDTO>> {
-        if (!authService.isTokenValid(token))
+        if (authenticateAndGetSubject(token, req) == null) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build()
+        }
 
         val articles = articleService.searchArticles(keywords, published = false)
 
@@ -71,7 +99,8 @@ class ArticleController(
     @GetMapping("/administer/{id}")
     fun getArticle(
         @RequestHeader("Auth-Token") token: String?,
-        @PathVariable id: String
+        @PathVariable id: String,
+        req: HttpServletRequest
     ): ResponseEntity<ArticleResponseDTO> {
         val validId = id.toLongOrNull()
             ?: return ResponseEntity.badRequest().build()
@@ -79,8 +108,9 @@ class ArticleController(
         val article = articleService.getArticle(validId)
             ?: return ResponseEntity.notFound().build()
 
-        if (!article.published && !authService.isTokenValid(token))
+        if (!article.published && authenticateAndGetSubject(token, req) == null) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build()
+        }
 
         return ResponseEntity.ok(article.toDTO())
     }
@@ -96,15 +126,17 @@ class ArticleController(
     @PostMapping("/administer")
     fun postArticle(
         @RequestHeader("Auth-Token") token: String?,
-        @RequestBody dto: ArticleRequestDTO
+        @RequestBody dto: ArticleRequestDTO,
+        req: HttpServletRequest
     ): ResponseEntity<Unit> {
-        if (!authService.isTokenValid(token))
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build()
+        val subject = authenticateAndGetSubject(token, req)
+            ?: return ResponseEntity.status(HttpStatus.FORBIDDEN).build()
 
         val article = articleService.saveArticle(dto)
             ?: return ResponseEntity.badRequest().build()
 
-        /* Build the required URI for the '201 Created' response. */
+        logger.info(messages.createdArticle, article.id, subject, req.remoteAddr)
+
         val uri = ServletUriComponentsBuilder
             .fromCurrentRequestUri()
             .path("/{id}")
@@ -127,16 +159,19 @@ class ArticleController(
     fun putArticle(
         @RequestHeader("Auth-Token") token: String?,
         @PathVariable id: String,
-        @RequestBody dto: ArticleRequestDTO
+        @RequestBody dto: ArticleRequestDTO,
+        req: HttpServletRequest
     ): ResponseEntity<Unit> {
-        if (!authService.isTokenValid(token))
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build()
+        val subject = authenticateAndGetSubject(token, req)
+            ?: return ResponseEntity.status(HttpStatus.FORBIDDEN).build()
 
         val validId = id.toLongOrNull()
             ?: return ResponseEntity.badRequest().build()
 
         articleService.updateArticle(validId, dto)
             ?: return ResponseEntity.notFound().build()
+
+        logger.info(messages.updatedArticle, id, subject, req.remoteAddr)
 
         return ResponseEntity.ok().build()
     }
@@ -151,15 +186,18 @@ class ArticleController(
     @DeleteMapping("/administer/{id}")
     fun deleteArticle(
         @RequestHeader("Auth-Token") token: String?,
-        @PathVariable id: String
+        @PathVariable id: String,
+        req: HttpServletRequest
     ): ResponseEntity<Unit> {
-        if (!authService.isTokenValid(token))
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build()
+        val subject = authenticateAndGetSubject(token, req)
+            ?: return ResponseEntity.status(HttpStatus.FORBIDDEN).build()
 
         val parsedId = id.toLongOrNull()
             ?: return ResponseEntity.badRequest().build()
 
         articleService.deleteArticle(parsedId)
+
+        logger.info(messages.deletedArticle, id, subject, req.remoteAddr)
 
         return ResponseEntity.noContent().build()
     }
@@ -174,16 +212,19 @@ class ArticleController(
     @PostMapping("/administer/{id}/publish")
     fun publishArticle(
         @RequestHeader("Auth-Token") token: String?,
-        @PathVariable id: String
+        @PathVariable id: String,
+        req: HttpServletRequest
     ): ResponseEntity<Unit> {
-        if (!authService.isTokenValid(token))
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build()
+        val subject = authenticateAndGetSubject(token, req)
+            ?: return ResponseEntity.status(HttpStatus.FORBIDDEN).build()
 
         val validId = id.toLongOrNull()
             ?: return ResponseEntity.badRequest().build()
 
         articleService.publishArticle(validId)
             ?: return ResponseEntity.badRequest().build()
+
+        logger.info(messages.publishedArticle, id, subject, req.remoteAddr)
 
         return ResponseEntity.ok().build()
     }

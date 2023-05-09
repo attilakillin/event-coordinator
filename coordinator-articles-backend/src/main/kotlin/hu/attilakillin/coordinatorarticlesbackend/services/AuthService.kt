@@ -1,6 +1,7 @@
 package hu.attilakillin.coordinatorarticlesbackend.services
 
 import hu.attilakillin.coordinatorarticlesbackend.config.PropertiesConfiguration
+import io.jsonwebtoken.Claims
 import io.jsonwebtoken.JwtException
 import io.jsonwebtoken.Jwts
 import org.springframework.stereotype.Service
@@ -38,20 +39,22 @@ class AuthService(
      * based on its timestamps and its issuer fields.
      * To make usage easier, a null parameter is also accepted, and immediately rejected.
      */
-    fun isTokenValid(token: String?): Boolean {
-        if (token == null) return false
+    fun isTokenValid(token: String?): Pair<Boolean, Claims?> {
+        if (token == null) return Pair(false, null)
 
         val parser = Jwts.parserBuilder().setSigningKey(publicKey).build()
         val claims = try {
             parser.parseClaimsJws(token)
         } catch (ex: JwtException) {
-            return false
+            return Pair(false, null)
         }
 
         val now = Date.from(Instant.now())
 
-        return claims.body.notBefore.before(now)
+        val valid = claims.body.notBefore.before(now)
             && claims.body.expiration.after(now)
             && claims.body.issuer in configuration.auth.allowedIssuers
+
+        return Pair(valid, claims.body)
     }
 }
