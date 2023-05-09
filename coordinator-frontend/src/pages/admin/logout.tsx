@@ -1,4 +1,4 @@
-import BasicFrame from "@/components/frames/basic-frame";
+import CenteredFrame from "@/components/frames/centered-frame";
 import { AuthenticationService } from "@/lib/services/auth-service";
 import { useRouter } from "next/router";
 import { useEffect } from "react";
@@ -18,5 +18,5 @@ export default function AdminLogout() {
     }, [router]);
 
     // Temporary page while logging out is in progress.
-    return <BasicFrame title='Kijelentkezés'>Kijelentkezés folyamatban...</BasicFrame>;
+    return <CenteredFrame title='Kijelentkezés'>Kijelentkezés folyamatban...</CenteredFrame>;
 };

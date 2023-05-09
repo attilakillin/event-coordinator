@@ -39,7 +39,10 @@ export default function ArticleDraftView() {
     // Set up publish button handler.
     const handlePublishButton = () => {
         ArticleService.publish(router.query.id![0])
-            .then(() => router.push('/articles/drafts'))
+            .then(() => {
+                toast.success('Sikeres publikálás!');
+                router.push('/articles');
+            })
             .catch(() => toast.error('Hiba történt: A cikk publikálása nem sikerült!'));
     }
 
