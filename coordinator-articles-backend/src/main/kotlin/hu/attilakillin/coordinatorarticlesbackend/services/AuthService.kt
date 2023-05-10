@@ -35,26 +35,40 @@ class AuthService(
     }
 
     /**
-     * Checks whether a given JWT token string is valid or not
-     * based on its timestamps and its issuer fields.
-     * To make usage easier, a null parameter is also accepted, and immediately rejected.
+     * Returns the verified list of claims of a JWT token.
+     * Returns null if the token is null, invalid, or wasn't signed with the proper key.
+     *
+     * This method does not care about validity - it only verifies that the token was
+     * properly signed, and is in the correct format.
      */
-    fun isTokenValid(token: String?): Pair<Boolean, Claims?> {
-        if (token == null) return Pair(false, null)
-
-        val parser = Jwts.parserBuilder().setSigningKey(publicKey).build()
-        val claims = try {
-            parser.parseClaimsJws(token)
-        } catch (ex: JwtException) {
-            return Pair(false, null)
+    fun getVerifiedClaims(token: String?): Claims? {
+        if (token == null) {
+            return null
         }
 
+        val parser = Jwts.parserBuilder().setSigningKey(publicKey).build()
+        return try {
+            parser.parseClaimsJws(token).body
+        } catch (ex: JwtException) {
+            null
+        }
+    }
+
+    /**
+     * Checks whether a given JWT token string is valid or not
+     * based on its timestamps and its issuer fields.
+     */
+    fun validateClaims(claims: Claims): Boolean {
         val now = Date.from(Instant.now())
+        return claims.notBefore.before(now) && claims.expiration.after(now)
+            && claims.issuer in configuration.auth.allowedIssuers
+    }
 
-        val valid = claims.body.notBefore.before(now)
-            && claims.body.expiration.after(now)
-            && claims.body.issuer in configuration.auth.allowedIssuers
-
-        return Pair(valid, claims.body)
+    /**
+     * Verifies and validates a given token. A null parameter is considered invalid.
+     */
+    fun isTokenValid(token: String?): Boolean {
+        val claims = getVerifiedClaims(token) ?: return false
+        return validateClaims(claims)
     }
 }

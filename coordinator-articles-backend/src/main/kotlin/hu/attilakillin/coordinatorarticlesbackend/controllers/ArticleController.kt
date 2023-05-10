@@ -4,6 +4,7 @@ import hu.attilakillin.coordinatorarticlesbackend.dto.*
 import hu.attilakillin.coordinatorarticlesbackend.services.ArticleService
 import hu.attilakillin.coordinatorarticlesbackend.services.AuthService
 import jakarta.servlet.http.HttpServletRequest
+import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -25,29 +26,38 @@ class ArticleController(
     private val articleService: ArticleService,
     private val authService: AuthService
 ) {
+    /**
+     * Logging instance. All logging is done by the controller in
+     * order to get as much additional information as possible.
+     */
     private val logger = LoggerFactory.getLogger(this.javaClass)
-    private val messages = object {
-        val failedToken = "Token verification failed: (IP: '{}', requested path: '{}', method: '{}')"
-        val passedToken = "Token validated: (subject: '{}', IP: '{}', valid: '{}', requested  path: '{}', method: '{}')"
-        val createdArticle = "Created article: (id: '{}', subject: '{}', IP '{}')"
-        val updatedArticle = "Updated article: (id: '{}', subject: '{}', IP '{}')"
-        val deletedArticle = "Deleted article: (id: '{}', subject: '{}', IP '{}')"
-        val publishedArticle = "Published article: (id: '{}', subject: '{}', IP '{}')"
+
+    /**
+     * Authenticate with the given token, and return whether the token is valid, or not.
+     */
+    fun isTokenValid(token: String?, req: HttpServletRequest): Boolean {
+        val claims = authService.getVerifiedClaims(token)
+        if (claims == null) {
+            logger.logTokenNotVerified(req)
+            return false
+        }
+
+        return authService.validateClaims(claims)
     }
 
     /**
-     * Authenticate with the given token, and return the subject of the valid token as a string,
-     * or return null otherwise.
+     * Authenticate with the given token, and return whether the token is valid or not,
+     * as well as the subject administrator's name, if it is valid.
      */
-    private fun authenticateAndGetSubject(token: String?, req: HttpServletRequest): String? {
-        val (valid, claims) = authService.isTokenValid(token)
+    fun isTokenValidWithSubject(token: String?, req: HttpServletRequest): Pair<Boolean, String?> {
+        val claims = authService.getVerifiedClaims(token)
         if (claims == null) {
-            logger.info(messages.failedToken, req.remoteAddr, req.requestURI, req.method)
-        } else {
-            logger.info(messages.passedToken, claims.subject, req.remoteAddr, valid, req.requestURI, req.method)
+            logger.logTokenNotVerified(req)
+            return Pair(false, null)
         }
 
-        return if (valid) claims?.subject else null
+        val valid = authService.validateClaims(claims)
+        return Pair(valid, claims.subject)
     }
 
     /**
@@ -74,11 +84,11 @@ class ArticleController(
      */
     @GetMapping("/drafts")
     fun searchDraftArticles(
-        @RequestHeader("Auth-Token") token: String?,
         @RequestParam keywords: String?,
+        @RequestHeader("Auth-Token") token: String?,
         req: HttpServletRequest
     ): ResponseEntity<List<ArticleSummaryDTO>> {
-        if (authenticateAndGetSubject(token, req) == null) {
+        if (!isTokenValid(token, req)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build()
         }
 
@@ -98,8 +108,8 @@ class ArticleController(
      */
     @GetMapping("/administer/{id}")
     fun getArticle(
-        @RequestHeader("Auth-Token") token: String?,
         @PathVariable id: String,
+        @RequestHeader("Auth-Token") token: String?,
         req: HttpServletRequest
     ): ResponseEntity<ArticleResponseDTO> {
         val validId = id.toLongOrNull()
@@ -108,7 +118,7 @@ class ArticleController(
         val article = articleService.getArticle(validId)
             ?: return ResponseEntity.notFound().build()
 
-        if (!article.published && authenticateAndGetSubject(token, req) == null) {
+        if (!article.published && !isTokenValid(token, req)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build()
         }
 
@@ -125,17 +135,17 @@ class ArticleController(
      */
     @PostMapping("/administer")
     fun postArticle(
-        @RequestHeader("Auth-Token") token: String?,
         @RequestBody dto: ArticleRequestDTO,
+        @RequestHeader("Auth-Token") token: String?,
         req: HttpServletRequest
     ): ResponseEntity<Unit> {
-        val subject = authenticateAndGetSubject(token, req)
-            ?: return ResponseEntity.status(HttpStatus.FORBIDDEN).build()
+        val (valid, subject) = isTokenValidWithSubject(token, req)
+        if (!valid || subject == null) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build()
+        }
 
         val article = articleService.saveArticle(dto)
             ?: return ResponseEntity.badRequest().build()
-
-        logger.info(messages.createdArticle, article.id, subject, req.remoteAddr)
 
         val uri = ServletUriComponentsBuilder
             .fromCurrentRequestUri()
@@ -143,6 +153,7 @@ class ArticleController(
             .buildAndExpand(article.id)
             .toUri()
 
+        logger.logArticleModified(req, article.id, "Created", subject)
         return ResponseEntity.created(uri).build()
     }
 
@@ -162,8 +173,10 @@ class ArticleController(
         @RequestBody dto: ArticleRequestDTO,
         req: HttpServletRequest
     ): ResponseEntity<Unit> {
-        val subject = authenticateAndGetSubject(token, req)
-            ?: return ResponseEntity.status(HttpStatus.FORBIDDEN).build()
+        val (valid, subject) = isTokenValidWithSubject(token, req)
+        if (!valid || subject == null) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build()
+        }
 
         val validId = id.toLongOrNull()
             ?: return ResponseEntity.badRequest().build()
@@ -171,8 +184,7 @@ class ArticleController(
         articleService.updateArticle(validId, dto)
             ?: return ResponseEntity.notFound().build()
 
-        logger.info(messages.updatedArticle, id, subject, req.remoteAddr)
-
+        logger.logArticleModified(req, validId, "Updated", subject)
         return ResponseEntity.ok().build()
     }
 
@@ -189,16 +201,17 @@ class ArticleController(
         @PathVariable id: String,
         req: HttpServletRequest
     ): ResponseEntity<Unit> {
-        val subject = authenticateAndGetSubject(token, req)
-            ?: return ResponseEntity.status(HttpStatus.FORBIDDEN).build()
+        val (valid, subject) = isTokenValidWithSubject(token, req)
+        if (!valid || subject == null) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build()
+        }
 
         val parsedId = id.toLongOrNull()
             ?: return ResponseEntity.badRequest().build()
 
         articleService.deleteArticle(parsedId)
 
-        logger.info(messages.deletedArticle, id, subject, req.remoteAddr)
-
+        logger.logArticleModified(req, parsedId, "Deleted", subject)
         return ResponseEntity.noContent().build()
     }
 
@@ -215,8 +228,10 @@ class ArticleController(
         @PathVariable id: String,
         req: HttpServletRequest
     ): ResponseEntity<Unit> {
-        val subject = authenticateAndGetSubject(token, req)
-            ?: return ResponseEntity.status(HttpStatus.FORBIDDEN).build()
+        val (valid, subject) = isTokenValidWithSubject(token, req)
+        if (!valid || subject == null) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build()
+        }
 
         val validId = id.toLongOrNull()
             ?: return ResponseEntity.badRequest().build()
@@ -224,8 +239,21 @@ class ArticleController(
         articleService.publishArticle(validId)
             ?: return ResponseEntity.badRequest().build()
 
-        logger.info(messages.publishedArticle, id, subject, req.remoteAddr)
-
+        logger.logArticleModified(req, validId, "Published", subject)
         return ResponseEntity.ok().build()
     }
+}
+
+/* Logging extension functions. */
+
+private val HttpServletRequest.realIp get() = getHeader("X-Real-Ip")
+
+private fun Logger.logTokenNotVerified(req: HttpServletRequest) {
+    val message = "Token verification failed: (IP: '{}', requested path: '{}', method: '{}')"
+    info(message, req.realIp, req.requestURI, req.method)
+}
+
+private fun Logger.logArticleModified(req: HttpServletRequest, article: Long, action: String, subject: String) {
+    val message = "{} article: (id: '{}', subject: '{}', IP '{}')"
+    info(message, action, article, subject, req.realIp)
 }
