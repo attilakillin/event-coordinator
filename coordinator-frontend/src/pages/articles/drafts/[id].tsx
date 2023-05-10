@@ -24,21 +24,21 @@ export default function ArticleDraftView() {
     // Load article details upon page load.
     useEffect(() => {
         if (typeof router.query.id !== 'undefined') {
-            ArticleService.get(router.query.id![0])
+            ArticleService.get(router.query.id as string)
                 .then(data => {
                     setTitle(data.title);
                     setContent(data.content);
                 })
                 .catch(() => {
                     toast.error('Hiba történt: A cikk betöltése nem sikerült!');
-                    router.push('/articles');
+                    router.push('/articles/drafts');
                 });
         }
     }, [router, router.query.id]);
 
     // Set up publish button handler.
     const handlePublishButton = () => {
-        ArticleService.publish(router.query.id![0])
+        ArticleService.publish(router.query.id as string)
             .then(() => {
                 toast.success('Sikeres publikálás!');
                 router.push('/articles');
@@ -51,7 +51,7 @@ export default function ArticleDraftView() {
 
     // Set up delete button handler.
     const handleDeleteButton = () => {
-        ArticleService.remove(router.query.id![0])
+        ArticleService.remove(router.query.id! as string)
             .then(() => {
                 toast.success('Sikeres törlés!');
                 router.push('/articles/drafts');

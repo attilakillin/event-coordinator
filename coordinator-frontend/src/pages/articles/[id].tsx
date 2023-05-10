@@ -22,7 +22,7 @@ export default function ArticleView() {
     // Load article details upon page load.
     useEffect(() => {
         if (typeof router.query.id !== 'undefined') {
-            ArticleService.get(router.query.id![0])
+            ArticleService.get(router.query.id as string)
                 .then(data => {
                     setTitle(data.title);
                     setContent(data.content);
@@ -39,7 +39,7 @@ export default function ArticleView() {
 
     // Set up delete button handler.
     const handleDeleteButton = () => {
-        ArticleService.remove(router.query.id![0])
+        ArticleService.remove(router.query.id as string)
             .then(() => {
                 toast.success('Sikeres törlés!');
                 router.push('/articles/drafts');

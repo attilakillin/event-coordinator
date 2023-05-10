@@ -16,7 +16,8 @@ export default function App({ Component, pageProps }: AppProps) {
             <Component {...pageProps} />
         </div>
         <ToastContainer
-            position='top-center' autoClose={2000} transition={Slide} closeOnClick hideProgressBar
+            position='bottom-left' autoClose={2000} transition={Slide}
+            closeOnClick hideProgressBar newestOnTop
         />
     </>;
 }

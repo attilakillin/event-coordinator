@@ -58,7 +58,7 @@ export default function ArticleCreate() {
     useEffect(() => {
         if (!updating) return;
         
-        ArticleService.get(router.query.id![0])
+        ArticleService.get(router.query.id as string)
             .then(data => {
                 setTitle(data.title);
                 setContent(data.content);
@@ -75,7 +75,7 @@ export default function ArticleCreate() {
         const target = (published) ? '/articles' : '/articles/drafts';
 
         const request = (updating)
-            ? ArticleService.put(router.query.id![0], title, content)
+            ? ArticleService.put(router.query.id as string, title, content)
             : ArticleService.post(title, content);
 
         request
