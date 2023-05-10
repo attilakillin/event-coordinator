@@ -17,12 +17,24 @@ interface ArticleRepository : JpaRepository<Article, Long> {
      * Return a page of all articles that match on the specified keywords
      * either in their title or in their text field.
      * Based on the published flag, returns either a list of published, or a list
-     * of draft articles in descending order of their creation.
+     * of draft articles.
+     *
+     * Orders the results in a semi-intelligent way.
      */
     @Query(value = """
         SELECT * FROM articles
-        WHERE MATCH(title, text) AGAINST(?1) AND published = ?2
-        ORDER BY created DESC
+        WHERE published = :published
+        AND (title LIKE CONCAT('%', :keywords, '%') OR text LIKE CONCAT('%', :keywords, '%'))
+        ORDER BY
+            title LIKE CONCAT(:keywords, '%') desc,
+            IFNULL(NULLIF(INSTR(title, CONCAT(' ', :keywords)), 0), 99999),
+            IFNULL(NULLIF(INSTR(title, :keywords), 0), 99999),
+            
+            text LIKE CONCAT(:keywords, '%') desc,
+            IFNULL(NULLIF(INSTR(text, CONCAT(' ', :keywords)), 0), 99999),
+            IFNULL(NULLIF(INSTR(text, :keywords), 0), 99999),
+            
+            created DESC;
     """, nativeQuery = true)
     fun searchArticlesByPublication(keywords: String, published: Boolean, pageable: Pageable): Page<Article>
 
@@ -33,7 +45,7 @@ interface ArticleRepository : JpaRepository<Article, Long> {
      */
     @Query(value = """
         SELECT * FROM articles
-        WHERE published = ?1
+        WHERE published = :published
         ORDER BY created DESC
     """, nativeQuery = true)
     fun findAllArticlesByPublication(published: Boolean): List<Article>

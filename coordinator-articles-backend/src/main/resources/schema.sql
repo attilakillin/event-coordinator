@@ -6,7 +6,5 @@ CREATE TABLE IF NOT EXISTS articles (
 
     title     VARCHAR(255)               NOT NULL,
     text      TEXT                       NOT NULL,
-    content   TEXT                       NOT NULL,
-
-    FULLTEXT(title, text)
-) ENGINE=InnoDB;
+    content   TEXT                       NOT NULL
+);
