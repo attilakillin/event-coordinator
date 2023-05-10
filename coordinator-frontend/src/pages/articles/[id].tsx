@@ -40,9 +40,15 @@ export default function ArticleView() {
     // Set up delete button handler.
     const handleDeleteButton = () => {
         ArticleService.remove(router.query.id![0])
-            .then(() => router.push('/articles'))
+            .then(() => {
+                toast.success('Sikeres törlés!');
+                router.push('/articles/drafts');
+            })
             .catch(() => toast.error('Hiba történt: A cikk törlése nem sikerült!'));
     };
+
+    // Responsive additional button styling
+    const buttonStyles = 'mr-0 md:mr-4 mb-2 md:mb-0';
 
     // Render final page.
     return (
@@ -54,11 +60,11 @@ export default function ArticleView() {
                     <QuillRenderer content={content} />
                 </div>
 
-                <div className='flex justify-end mt-14 mb-4'>
+                <div className='flex flex-col md:flex-row justify-end mt-14 mb-4'>
                     {
                         (status == AuthenticationStatus.SUCCESS) && <>
-                            <Button onClick={handleEditButton} className='mr-4'>Szerkesztés</Button>
-                            <Button onClick={handleDeleteButton} className='mr-4'>Törlés</Button>
+                            <Button onClick={handleEditButton} className={buttonStyles}>Szerkesztés</Button>
+                            <Button onClick={handleDeleteButton} className={buttonStyles}>Törlés</Button>
                         </>
                     }
                     <Button onClick={() => router.back()} primary>Vissza</Button>

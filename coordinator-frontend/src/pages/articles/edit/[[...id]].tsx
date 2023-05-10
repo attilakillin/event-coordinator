@@ -115,8 +115,8 @@ export default function ArticleCreate() {
                         }
                     </div>
 
-                    <div className='flex justify-end mt-14 mb-4'>
-                        <Button onClick={handlePreviewClick} className='mr-4'>
+                    <div className='flex flex-col md:flex-row justify-end mt-20 md:mt-14 mb-4'>
+                        <Button onClick={handlePreviewClick} className='mr-0 md:mr-4 mb-2 md:mb-0'>
                             {isPreview ? 'Szerkesztés' : 'Előnézet'}
                         </Button>
                         <Button onClick={handleSaveClick} primary>Mentés</Button>
