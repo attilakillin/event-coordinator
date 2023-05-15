@@ -1,11 +1,11 @@
-package hu.attilakillin.coordinatorarticlesbackend
+package hu.attilakillin.coordinatorparticipantsbackend
 
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 
 @SpringBootApplication
-class CoordinatorArticlesBackendApplication
+class CoordinatorParticipantsBackendApplication
 
 fun main(args: Array<String>) {
-	runApplication<CoordinatorArticlesBackendApplication>(*args)
+	runApplication<CoordinatorParticipantsBackendApplication>(*args)
 }

@@ -8,7 +8,6 @@ import org.springframework.stereotype.Repository
 
 /**
  * JPA repository. The database table is initialized from the 'schema.sql' resource file.
- * In order to use full-text indexing, the underlying database engine must be MySQL.
  */
 @Repository
 interface ArticleRepository : JpaRepository<Article, Long> {

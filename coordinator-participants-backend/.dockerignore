@@ -1,0 +1,10 @@
+Dockerfile
+.dockerignore
+
+.gradle/
+.idea/
+build/
+!build/coordinator-articles-backend.jar
+
+.git/
+.gitignore

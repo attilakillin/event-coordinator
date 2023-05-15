@@ -1,10 +1,10 @@
-package hu.attilakillin.coordinatorarticlesbackend
+package hu.attilakillin.coordinatorparticipantsbackend
 
 import org.junit.jupiter.api.Test
 import org.springframework.boot.test.context.SpringBootTest
 
 @SpringBootTest
-class CoordinatorNewsBackendApplicationTests {
+class CoordinatorParticipantsBackendApplicationTests {
 
 	@Test
 	fun contextLoads() {

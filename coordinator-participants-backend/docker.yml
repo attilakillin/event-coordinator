@@ -1,0 +1,33 @@
+# This properties file is attached to the Docker container
+# as an 'application.yml' file of the backend JAR file.
+# Configure runtime properties here.
+# Further default values are set in the 'application.yml' file
+# (found in the sources), which is bundled in the application JAR.
+
+# Set database access properties
+spring:
+  datasource:
+    url: 'jdbc:mysql://participants-db:3306/participants'
+    username: 'overseer'
+    password: 'overseer'
+
+# Set authentication verification parameters.
+application:
+  auth:
+    allowed-issuers:
+      - 'coordinator-auth-backend'
+    rsa-public-key: |
+      -----BEGIN PUBLIC KEY-----
+      MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAtFNhDuu8QDCSsosFN433
+      EnKxHrSlREt3/eYBKOXREbZwqvwhjgnLPpyRlRUocsbT97hU7kEncLhOVFQy3Qn4
+      hpHPTh2yACK5Dcm93VigulF0WfXb9QuPFXTeBtXxEyfn1FFiYI9SvxAm0bKsTH/R
+      ATrEHh+8INNXt2zAsdnJu8SKVcn7TAKv57G/0IZUNupYRkFQNKPoBBqVtH++Wmhj
+      v12mQpEjFxvh3E3bzW5Dfsp4wErJCiNTksRDk9AIVNLMuTxNiQcRsEnjWtNyt+pT
+      OcNbWDyaCaxAu3raKlg5jX5mACVKMmVwJOhUulCQqI7VUs5HCN9K4w5f73EQtQOv
+      fx8yeODR4PL5E+0nmKf7fU7EcNO3anwINCQ4jjl3wWYwpg4Jf9BUm9oj3wC6gJJs
+      M3rOUX73uQjcXwIXK+0sa6fViTh4oR9ws1ggaSG3q/9uaRzuw7lb9osaY5luTITI
+      kc9lFYfVDrhM6il/t/NGfL1K8h7+x4ZtZgf0Mi4fFj3m8ZWye+R7E6NCujoSm5Yc
+      sQI8t0ac5APyjD3CBCHmvfzfiMTib6hpnXdtCF6d1/1ige7BNO+Y624k6Eu1c3WW
+      mZSiLANz95rB/qe+lIB7f6RiLvvn0MSigpC9KYqOGmTMII1x9/sEd6vLH4BrTeq4
+      /NHAc+IAmb/kN2CpvE+k1T8CAwEAAQ==
+      -----END PUBLIC KEY-----
