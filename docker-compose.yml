@@ -53,5 +53,26 @@ services:
                 config: docker.yml
         networks:
             - internal
+
+    # Participants components
+    participants-backend:
+        container_name: participants-backend
+        build:
+            context: ./coordinator-participants-backend
+            dockerfile: 'Dockerfile-${BUILD_PHASE_LOCATION}'
+            args:
+                config: docker.yml
+        networks:
+            - internal
+    participants-db:
+        container_name: participants-db
+        image: mysql:8.0
+        environment:
+            MYSQL_DATABASE: "participants"
+            MYSQL_ROOT_PASSWORD: ${PARTICIPANTS_DB_ROOT_PASSWORD}
+            MYSQL_USER: ${PARTICIPANTS_DB_USER}
+            MYSQL_PASSWORD: ${PARTICIPANTS_DB_PASS}
+        networks:
+            - internal
 networks:
     internal:

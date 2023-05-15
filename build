@@ -29,6 +29,18 @@ if [ $? -ne 0 ]; then
 fi
 cd ..
 
+# Participants backend
+cd coordinator-participants-backend
+printf "\nBuilding participants-backend artifact: JAR file...\n"
+
+./gradlew bootJar
+
+if [ $? -ne 0 ]; then
+    printf "\nFailed building articles-backend, exiting!\n"
+    exit
+fi
+cd ..
+
 # Frontend
 cd coordinator-frontend
 printf "\nBuilding frontend artifact: NextJS standalone build...\n"
