@@ -34,7 +34,7 @@ export default function AdminLogin() {
     // Generate rendered page.
     return (
         <CenteredFrame title='Bejelentkezés'>
-            <div className='bg-theme-100 p-8'>
+            <div className='bg-theme-100 p-8 my-2'>
                 <div className='mb-4'>
                     <label className={labelStyles} htmlFor='username'>Felhasználónév</label>
                     <Input 

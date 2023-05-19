@@ -8,6 +8,7 @@ import { useState } from 'react';
  */
 const basePathList = [
     { name: 'Hírek', path: '/articles' },
+    { name: 'Regisztráció', path: '/participants/register' }
 ];
 
 /**
@@ -15,7 +16,8 @@ const basePathList = [
  */
 const authPathList = [
     { name: 'Piszkozatok', path: '/articles/drafts' },
-    { name: 'Új bejegyzés', path: '/articles/edit' }
+    { name: 'Új bejegyzés', path: '/articles/edit' },
+    { name: 'Résztvevők', path: '/participants' }
 ];
 
 /**
