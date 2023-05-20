@@ -39,6 +39,7 @@ export default function ParticipantRegister() {
             });
     };
 
+    // Render page content.
     return <>
         <CenteredFrame title='Regisztráció'>
             <div className='flex-1 container mx-auto px-4 flex flex-col'>
