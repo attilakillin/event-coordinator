@@ -3,22 +3,85 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
 
+/** Typescript type for a simple navigation link. */
+interface SimpleLink {
+    name: string,
+    path: string
+};
+
+/** Typescript type for a complex, dropdown navigation link group. */
+interface DropdownLink {
+    name: string,
+    children: SimpleLink[]
+};
+
 /**
- * Populates the navigation item list. These elements are visible to all users.
+ * Populates the navigation item list for unathenticated users.
  */
-const basePathList = [
+const basePaths: SimpleLink[] = [
     { name: 'Hírek', path: '/articles' },
-    { name: 'Regisztráció', path: '/participants/register' }
+    { name: 'Jelentkezés', path: '/participants/register' }
 ];
 
 /**
- * Populates the navigation item list. These elements are only visible to authenticated users.
+ * Populates the navigation item list for authenticated users.
  */
-const authPathList = [
-    { name: 'Piszkozatok', path: '/articles/drafts' },
-    { name: 'Új bejegyzés', path: '/articles/edit' },
-    { name: 'Résztvevők', path: '/participants' }
+const authPaths: DropdownLink[] = [
+    {
+        name: 'Hírportál',
+        children: [
+            { name: 'Hírek', path: '/articles' },
+            { name: 'Piszkozatok', path: '/articles/drafts' },
+            { name: 'Új bejegyzés', path: '/articles/edit' }
+        ]
+    },
+    {
+        name: 'Résztvevők',
+        children: [
+            { name: 'Résztvevőlista', path: '/participants' },
+            { name: 'Jelentkezés', path: '/participants/register' }
+        ]
+    }
 ];
+
+/**
+ * A simple clickable navigation item link.
+ */
+function SimpleNavItem(props: { item: SimpleLink, location?: string, key?: number }) {
+    const styles = 'px-6 py-3 mx-3 my-1 whitespace-nowrap hover:outline hover:outline-3 hover:outline-theme-800 '
+        + ((props.item.path === props.location) ? 'bg-theme-800 text-theme-100' : '');
+
+    return (
+        <Link key={props.key} href={props.item.path} className={styles}>{props.item.name}</Link>
+    );
+}
+
+/**
+ * A complex navigation item that functions as a dropdown.
+ * Its children are clickable navigation links.
+ */
+function DropdownNavItem(props: { item: DropdownLink, location?: string, key?: number }) {
+    const rootStyle = 'group relative';
+    const itemStyle = 'px-6 py-3 mx-2 my-1 hover:outline hover:outline-3 hover:outline-theme-800 '
+        + ((props.item.children.some(child => (child.path === props.location))) ? 'bg-theme-800 text-theme-100' : '');
+    const listStyle = 'flex flex-wrap flex-col bg-theme-100 py-1 ml-6 '
+        + 'md:hidden md:group-hover:flex md:flex-nowrap md:w-auto md:group-hover:absolute '
+        + 'md:ml-0 md:drop-shadow-lg md:pb-2';
+
+    return (
+        <div key={props.key} className={rootStyle}>
+            <div className={itemStyle}>{props.item.name}</div>
+
+            <div className={listStyle}>
+                {
+                    props.item.children.map((child, i) =>
+                        <SimpleNavItem key={i} location={props.location} item={child} />
+                    )
+                }
+            </div>
+        </div>
+    );
+}
 
 /**
  * A component containing the whole site-wide navigation bar present on the top of a page.
@@ -28,26 +91,9 @@ export default function Navbar() {
     const status = useAuthentication();
     const { asPath } = useRouter();
 
-    // Tailwind styles and conditional styling functions.
-    const inactiveStyles = 'px-6 py-3 mx-2 my-1 hover:outline hover:outline-3 hover:outline-theme-800';
-    const selectedStyles = inactiveStyles + ' text-theme-100 bg-theme-800';
-    const addStyles = (path: string) => {
-        return (asPath == path) ? selectedStyles : inactiveStyles;
-    };
-
-    // Apply different classes to nav items based on current path.
-    const mapLinks = (links: Array<any>) => {
-        return links.map((item, i) =>
-            <Link key={i} href={item.path} className={addStyles(item.path)}>{item.name}</Link>
-        );
-    };
-
     // Handle mobile navigation bar expansion
     const [expanded, setExpanded] = useState(false);
-
-    const handleExpandClick = () => {
-        setExpanded(val => !val);
-    }
+    const handleExpandClick = () => setExpanded(val => !val);
 
     // Generate page header.
     return (
@@ -77,20 +123,16 @@ export default function Navbar() {
                 }>
                     {
                         (status == AuthenticationStatus.SUCCESS)
-                        ? mapLinks(basePathList.concat(authPathList))
-                        : mapLinks(basePathList)
+                        ? authPaths.map((child, i) => <DropdownNavItem item={child} location={asPath} key={i} />)
+                        : basePaths.map((child, i) => <SimpleNavItem item={child} location={asPath} key={i} />)
                     }
 
                     <div className='flex-1'></div>
 
                     {
                         (status == AuthenticationStatus.SUCCESS)
-                        ? <Link href='/admin/logout' className={inactiveStyles}>
-                            Kijelentkezés
-                        </Link>
-                        : <Link href='/admin/login' className={addStyles('/admin/login')}>
-                            Bejelentkezés
-                        </Link>
+                        ? <SimpleNavItem item={({ name: 'Kijelentkezés', path: '/admin/logout' })} location={asPath} />
+                        : <SimpleNavItem item={({ name: 'Bejelentkezés', path: '/admin/login' })} location={asPath} />
                     }
                 </div>
             </nav>
