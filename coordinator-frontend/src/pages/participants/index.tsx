@@ -48,7 +48,10 @@ export default function ParticipantIndex() {
             <div className='flex-1 container mx-auto px-4'>
                 <h1 className='mt-6 mb-4 text-2xl text-theme-800'>Regisztrált résztvevők</h1>
 
-                <ParticipantTable data={participants} />
+                <ParticipantTable
+                    data={participants}
+                    action={({ name: 'Törlés', callback: handleDeleteClick })}
+                />
 
                 <div className='mt-4 flex flex-row justify-center'>
                     <Button onClick={handleExportClick}>Exportálás (XLS)</Button>

@@ -1,11 +1,16 @@
 import Button from "@/components/builtin/button";
+import Id from "@/components/types/id";
 import { Participant } from "@/components/types/participant";
 import { useEffect } from "react";
 import { Column, TableInstance, TableState, UsePaginationInstanceProps, UsePaginationState, usePagination, useTable } from "react-table";
 
 
 interface ComponentProps {
-    data: Participant[]
+    data: (Participant & Id)[],
+    action: {
+        name: string,
+        callback: (id: string) => void
+    }
 };
 
 const table_columns = [
@@ -27,14 +32,14 @@ const table_columns = [
     {
         Header: 'Megjegyzések', accessor: 'notes'
     }
-] as Column<Participant>[];
+] as Column<Participant & Id>[];
 
 export default function ParticipantTable(props: ComponentProps) {
     const table = useTable(
         { columns: table_columns, data: props.data },
         usePagination
-    ) as TableInstance<Participant>
-        & UsePaginationInstanceProps<Participant>;
+    ) as TableInstance<Participant & Id>
+        & UsePaginationInstanceProps<Participant & Id>;
 
     const {
         getTableProps,
@@ -75,6 +80,7 @@ export default function ParticipantTable(props: ComponentProps) {
                                         </th>
                                     ))
                                 }
+                                <th className='bg-theme-100'></th>
                             </tr>
                         ))
                     }
@@ -84,7 +90,9 @@ export default function ParticipantTable(props: ComponentProps) {
                         page.map(row => {
                             prepareRow(row);
                             return (
-                                <tr className='border-b border-theme-600 hover:bg-theme-100' {...row.getRowProps()}>
+                                <tr className='border-b border-theme-600 hover:bg-theme-100'
+                                    {...row.getRowProps()}
+                                >
                                     {
                                         row.cells.map(cell => {
                                             return (
@@ -94,6 +102,13 @@ export default function ParticipantTable(props: ComponentProps) {
                                             )
                                         })
                                     }
+                                    <td>
+                                        <Button
+                                            onClick={() => props.action.callback(row.original.id.toString())}
+                                        >
+                                            {props.action.name}
+                                        </Button>
+                                    </td>
                                 </tr>
                             )
                         })
