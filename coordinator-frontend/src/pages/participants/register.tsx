@@ -13,8 +13,14 @@ import { toast } from "react-toastify";
 export default function ParticipantRegister() {
     // Form element values.
     const [fields, setFields] = useState<Participant>({
-        lastName: '', firstName: '', email: '', address: '', phoneNumber: '', notes: ''
+        lastName: '',
+        firstName: '',
+        email: '',
+        address: '',
+        phoneNumber: '',
+        notes: ''
     });
+
     const setFieldSetter = (which: string) => {
         return (value: string) => setFields((prev) => {
             prev[which as keyof Participant] = value;
@@ -29,6 +35,10 @@ export default function ParticipantRegister() {
 
     // Handle submit button clicks.
     const handleSubmitClick = () => {
+        if (!fields.lastName) { toast.error('A vezetéknév mező kötelező!'); return; }
+        if (!fields.firstName) { toast.error('A keresztnév mező kötelező!'); return; }
+        if (!fields.email.match(/.+@.+\..+/)) { toast.error('Az email mező kötelező!'); return; }
+
         ParticipantService.post(fields)
             .then(() => {
                 toast.success('Sikeres regisztráció!');
@@ -48,14 +58,18 @@ export default function ParticipantRegister() {
 
                     <div className='flex flex-col md:flex-row'>
                         <div className='mb-4 md:w-1/2 md:mr-2'>
-                            <label className={labelStyles} htmlFor='lastName'>Vezetéknév</label>
+                            <label className={labelStyles} htmlFor='lastName'>
+                                Vezetéknév <span className='text-red-600'>*</span>
+                            </label>
                             <Input 
                                 id='lastName' values={[fields.lastName, setFieldSetter('lastName')]} autoFocus
                                 onEnter={() => document.getElementById('firstName')!.focus()}
                             />
                         </div>
                         <div className='mb-4 md:w-1/2 md:ml-2'>
-                            <label className={labelStyles} htmlFor='firstName'>Keresztnév</label>
+                            <label className={labelStyles} htmlFor='firstName'>
+                                Keresztnév <span className='text-red-600'>*</span>
+                            </label>
                             <Input 
                                 id='firstName' values={[fields.firstName, setFieldSetter('firstName')]}
                                 onEnter={() => document.getElementById('email')!.focus()}
@@ -65,7 +79,9 @@ export default function ParticipantRegister() {
 
                     <div className='flex flex-col md:flex-row'>
                         <div className='mb-4 md:w-1/2 md:mr-2'>
-                            <label className={labelStyles} htmlFor='email'>Email</label>
+                            <label className={labelStyles} htmlFor='email'>
+                                Email <span className='text-red-600'>*</span>
+                            </label>
                             <Input 
                                 id='email' values={[fields.email, setFieldSetter('email')]}
                                 onEnter={() => document.getElementById('address')!.focus()}
