@@ -8,4 +8,6 @@ import org.springframework.stereotype.Repository
  */
 @Repository
 interface ParticipantRepository : JpaRepository<Participant, Long> {
+    /** Return a participant by email, or null, if no such participant exists. */
+    fun findByEmail(email: String): Participant?
 }

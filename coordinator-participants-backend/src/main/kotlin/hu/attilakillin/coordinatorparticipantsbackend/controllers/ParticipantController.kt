@@ -101,7 +101,7 @@ class ParticipantController(
      * otherwise, no matter if a participant was deleted or not.
      */
     @DeleteMapping("/{id}")
-    fun deleteArticle(
+    fun deleteParticipant(
         @RequestHeader("Auth-Token") token: String?,
         @PathVariable id: String,
         req: HttpServletRequest
@@ -118,6 +118,26 @@ class ParticipantController(
 
         logger.logParticipantModified(req, parsedId, "Deleted", subject)
         return ResponseEntity.noContent().build()
+    }
+
+    /**
+     * Check whether a participant with the given email exists or not.
+     *
+     * Returns an HTTP 200 response if a participant with the given email has been found,
+     * and an HTTP 404 response if no such entry could be found.
+     */
+    @PostMapping("/validate")
+    fun validateParticipant(
+        @RequestBody email: String,
+        req: HttpServletRequest
+    ): ResponseEntity<Unit> {
+        val participant = participantService.getParticipantByEmail(email)
+        if (participant == null) {
+            logger.logParticipantDoesNotExist(req, email)
+            return ResponseEntity.notFound().build()
+        } else {
+            return ResponseEntity.ok().build()
+        }
     }
 }
 
@@ -140,4 +160,11 @@ private fun Logger.logParticipantModified(
 ) {
     val message = "{} participant: (id: '{}', subject: '{}', IP '{}')"
     info(message, action, participant, subject, req.realIp)
+}
+
+private fun Logger.logParticipantDoesNotExist(
+    req: HttpServletRequest, email: String
+) {
+    val message = "Nonexistent participant queried: (email: '{}', IP '{}')"
+    info(message, email, req.realIp)
 }

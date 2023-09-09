@@ -1,0 +1,35 @@
+# This properties file sets the necessary runtime values that are
+# independent of the specific deployment.
+# It also zero-initializes every runtime-specific value as well,
+# but these must be overwritten (for example from an additional
+# properties file outside the runtime JAR) in order for the
+# application to perform properly.
+
+spring:
+  # Assume that a MySQL database is used, and disable boot
+  # exceptions if the database hasn't yet been initialized.
+  datasource:
+    driver-class-name: 'com.mysql.cj.jdbc.Driver'
+    hikari:
+      initialization-fail-timeout: 0
+
+    url: '' # ZERO INITIALIZED, configure properly.
+    username: '' # ZERO INITIALIZED, configure properly.
+    password: '' # ZERO INITIALIZED, configure properly.
+
+  # No schema creation from entities, as we use a schema.sql file.
+  jpa:
+    hibernate:
+      ddl-auto: 'none'
+  # And we need to use that schema.sql file even on a non-embedded setup.
+  sql:
+    init:
+      mode: 'always'
+
+# Set authentication verification parameters.
+application:
+  email-verification-url: '' # ZERO INITIALIZED, configure properly.
+  auth:
+    allowed-issuers:
+      - '' # ZERO INITIALIZED, configure properly.
+    rsa-public-key: '' # ZERO INITIALIZED, configure properly.

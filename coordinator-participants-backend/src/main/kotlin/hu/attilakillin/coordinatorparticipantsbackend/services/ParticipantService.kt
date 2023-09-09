@@ -44,6 +44,14 @@ class ParticipantService(
     }
 
     /**
+     * Return a participant by their email, or null, if no such participant
+     * was found.
+     */
+    fun getParticipantByEmail(email: String): Participant? {
+        return repository.findByEmail(email)
+    }
+
+    /**
      * Saves a participant.
      * Returns null if validation failed, else returns the saved entity.
      */
