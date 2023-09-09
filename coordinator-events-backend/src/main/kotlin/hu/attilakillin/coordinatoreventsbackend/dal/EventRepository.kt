@@ -20,5 +20,5 @@ interface EventRepository : JpaRepository<Event, Long> {
             
             created DESC;
     """, nativeQuery = true)
-    fun searchByTitle(title: String): List<Event>
+    fun searchByTitle(keywords: String): List<Event>
 }

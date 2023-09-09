@@ -74,5 +74,26 @@ services:
             MYSQL_PASSWORD: ${PARTICIPANTS_DB_PASS}
         networks:
             - internal
+
+    # Events components
+    events-backend:
+        container_name: events-backend
+        build:
+            context: ./coordinator-events-backend
+            dockerfile: 'Dockerfile-${BUILD_PHASE_LOCATION}'
+            args:
+                config: docker.yml
+        networks:
+            - internal
+    events-db:
+        container_name: events-db
+        image: mysql:8.0
+        environment:
+            MYSQL_DATABASE: "events"
+            MYSQL_ROOT_PASSWORD: ${EVENTS_DB_ROOT_PASSWORD}
+            MYSQL_USER: ${EVENTS_DB_USER}
+            MYSQL_PASSWORD: ${EVENTS_DB_PASS}
+        networks:
+            - internal
 networks:
     internal:
