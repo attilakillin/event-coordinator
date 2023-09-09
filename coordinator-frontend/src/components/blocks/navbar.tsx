@@ -20,7 +20,8 @@ interface DropdownLink {
  */
 const basePaths: SimpleLink[] = [
     { name: 'Hírek', path: '/articles' },
-    { name: 'Jelentkezés', path: '/participants/register' }
+    { name: 'Jelentkezés', path: '/participants/register' },
+    { name: 'Események', path: '/events' }
 ];
 
 /**
@@ -40,6 +41,12 @@ const authPaths: DropdownLink[] = [
         children: [
             { name: 'Résztvevőlista', path: '/participants' },
             { name: 'Jelentkezés', path: '/participants/register' }
+        ]
+    },
+    {
+        name: 'Események',
+        children: [
+            { name: 'Eseménylista', path: '/events' }
         ]
     }
 ];

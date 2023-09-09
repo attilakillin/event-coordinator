@@ -197,7 +197,7 @@ class EventController(
     @PostMapping("/register/{id}")
     fun registerToEvent(
         @PathVariable id: String,
-        @RequestBody email: String,
+        @RequestBody dto: RegisterRequestDTO,
         req: HttpServletRequest
     ): ResponseEntity<Unit> {
         val parsedId = id.toLongOrNull()
@@ -206,9 +206,9 @@ class EventController(
         eventService.getEvent(parsedId)
             ?: return ResponseEntity.badRequest().build()
 
-        val success = eventService.registerToEvent(email, parsedId)
+        val success = eventService.registerToEvent(dto.email, parsedId)
         if (!success) {
-            logger.logRegistrationUnsuccessful(req, parsedId, email)
+            logger.logRegistrationUnsuccessful(req, parsedId, dto.email)
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build()
         }
 
