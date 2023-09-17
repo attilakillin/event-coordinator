@@ -1,12 +1,8 @@
-import ParticipantTable from "@/components/blocks/participants/participant-table";
+import EventCard from "@/components/blocks/events/event-card";
 import Button from "@/components/builtin/button";
 import Input from "@/components/builtin/input";
-import AuthenticatedFrame from "@/components/frames/authenticated-frame";
 import BasicFrame from "@/components/frames/basic-frame";
-import Id from "@/components/types/id";
-import { Participant } from "@/components/types/participant";
-import { EventsService } from "@/lib/services/events-service";
-import { ParticipantService } from "@/lib/services/participant-service";
+import { EventService } from "@/lib/services/event-service";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useState } from "react";
 import { toast } from "react-toastify";
@@ -18,14 +14,14 @@ import { toast } from "react-toastify";
  * Does not require authentication, although some features are hidden to
  * unauthenticated users.
  */
-export default function EventsIndex() {
+export default function EventIndex() {
     // Handle state for both the article list and the search keywords.
     const [events, setEvents] = useState([]);
     const [keywords, setKeywords] = useState('');
     
     // Generic search function with a provideable query.
     const search = useCallback((query: string) => {
-        EventsService.search(query)
+        EventService.search(query)
             .then(data => setEvents(data))
             .catch(() => toast.error('Hiba történt: Az események betöltése nem sikerült!'));
     }, []);
@@ -53,7 +49,7 @@ export default function EventsIndex() {
                 </div>
 
                 {
-                    
+                    events.map((value, i) => <EventCard event={value} key={i} onClick={onClick} />)
                 }
             </div>
         </BasicFrame>

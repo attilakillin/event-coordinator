@@ -74,13 +74,30 @@ class EventController(
 
     /**
      * Returns a specified event given by its ID.
+     * Does not require authentication, but only returns a summary.
+     * Returns an HTTP 400 response if the ID is not a valid number,
+     * and an HTTP 404 response if no event is present with this ID.
+     */
+    @GetMapping("/{id}")
+    fun getEventSummary(@PathVariable id: String): ResponseEntity<EventSummaryDTO> {
+        val validId = id.toLongOrNull()
+            ?: return ResponseEntity.badRequest().build()
+
+        val event = eventService.getEvent(validId)
+            ?: return ResponseEntity.notFound().build()
+
+        return ResponseEntity.ok(event.toSummaryDTO())
+    }
+
+    /**
+     * Returns a specified event given by its ID.
      * Requires authentication. If the given authentication token is invalid,
      * returns an HTTP 403 response.
      * Otherwise, returns an HTTP 400 response if the ID is not a valid number,
      * and an HTTP 404 response if no event is present with this ID.
      */
     @GetMapping("/administer/{id}")
-    fun getEvent(
+    fun getEventDetails(
         @PathVariable id: String,
         @RequestHeader("Auth-Token") token: String?,
         req: HttpServletRequest

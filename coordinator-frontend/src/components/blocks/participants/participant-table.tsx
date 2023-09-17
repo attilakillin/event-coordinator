@@ -7,7 +7,7 @@ import { Column, TableInstance, TableState, UsePaginationInstanceProps, UsePagin
 
 interface ComponentProps {
     data: (Participant & Id)[],
-    action: {
+    action?: {
         name: string,
         callback: (id: string) => void
     }
@@ -80,7 +80,7 @@ export default function ParticipantTable(props: ComponentProps) {
                                         </th>
                                     ))
                                 }
-                                <th className='bg-theme-100'></th>
+                                {props.action && <th className='bg-theme-100'></th>}
                             </tr>
                         ))
                     }
@@ -102,13 +102,13 @@ export default function ParticipantTable(props: ComponentProps) {
                                             )
                                         })
                                     }
-                                    <td>
+                                    {props.action && <td>
                                         <Button
-                                            onClick={() => props.action.callback(row.original.id.toString())}
+                                            onClick={() => props.action!.callback(row.original.id.toString())}
                                         >
-                                            {props.action.name}
+                                            {props.action!.name}
                                         </Button>
-                                    </td>
+                                    </td>}
                                 </tr>
                             )
                         })

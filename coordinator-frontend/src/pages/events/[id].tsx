@@ -1,51 +1,83 @@
-import QuillRenderer from "@/components/blocks/articles/quill-renderer";
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Button from "@/components/builtin/button";
-import { ArticleService } from "@/lib/services/article-service";
 import { toast } from "react-toastify";
 import { AuthenticationStatus, useAuthentication } from "@/lib/hooks/authentication";
 import BasicFrame from "@/components/frames/basic-frame";
+import { EventService } from "@/lib/services/event-service";
+import Input from "@/components/builtin/input";
+import { ParticipantService } from "@/lib/services/participant-service";
+import ParticipantTable from "@/components/blocks/participants/participant-table";
+import { Participant } from "@/components/types/participant";
+import Id from "@/components/types/id";
 
 /**
- * Displays the detailed view of an article. Only displays
+ * Displays the detailed view of an event. Only displays
  * modification buttons to authenticated users.
  */
-export default function ArticleView() {
+export default function EventView() {
     const status = useAuthentication();
     const router = useRouter();
 
     // Set up state management.
     const [title, setTitle] = useState('');
-    const [content, setContent] = useState('');
+    const [participantCount, setParticipantCount] = useState(0);
+    const [participantList, setParticipantList] = useState<(Participant & Id)[]>([]);
 
-    // Load article details upon page load.
-    useEffect(() => {
+    const [email, setEmail] = useState('');
+
+    // Load event details upon page load.
+    const loadContent = useCallback(() => {
         if (typeof router.query.id !== 'undefined') {
-            ArticleService.get(router.query.id as string)
-                .then(data => {
-                    setTitle(data.title);
-                    setContent(data.content);
-                })
+            const promise = (status === AuthenticationStatus.SUCCESS)
+                ? EventService.getDetails(router.query.id as string)
+                    .then(data => {
+                        setTitle(data.title);
+                        (data.participants as string[]).forEach(email => 
+                            ParticipantService.getParticipantByEmail(email)
+                                .then(data =>
+                                    setParticipantList(list => [...list, data])
+                                )
+                        );
+                    })
+                : EventService.getSummary(router.query.id as string)
+                    .then(data => {
+                        setTitle(data.title);
+                        setParticipantCount(data.participants);
+                    });
+
+            promise
                 .catch(() => {
-                    toast.error('Hiba történt: A cikk betöltése nem sikerült!');
-                    router.push('/articles');
+                    toast.error('Hiba történt: Az esemény betöltése nem sikerült!');
+                    router.push('/events');
                 });
         }
-    }, [router, router.query.id]);
+    }, [router, status]);
+    useEffect(() => loadContent(), [loadContent]);
 
     // Set up edit button handler.
-    const handleEditButton = () => router.push('/articles/edit/' + router.query.id);
+    const handleEditButton = () => router.push('/events/edit/' + router.query.id);
 
     // Set up delete button handler.
     const handleDeleteButton = () => {
-        ArticleService.remove(router.query.id as string)
+        // TODO This is not what I want
+        EventService.remove(router.query.id as string)
             .then(() => {
                 toast.success('Sikeres törlés!');
-                router.push('/articles/drafts');
+                router.push('/events');
             })
-            .catch(() => toast.error('Hiba történt: A cikk törlése nem sikerült!'));
+            .catch(() => toast.error('Hiba történt: Az esemény törlése nem sikerült!'));
     };
+
+    // Set up registration handler.
+    const handleRegistration = () => {
+        EventService.registerToEvent(router.query.id as string, email)
+            .then(() => {
+                toast.success('Sikeres jelentkezés!');
+                loadContent();
+            })
+            .catch(() => toast.error('Hiba történt: Az eseményre való jelentkezés nem sikerült!'));
+    }
 
     // Responsive additional button styling
     const buttonStyles = 'mr-0 md:mr-4 mb-2 md:mb-0';
@@ -57,7 +89,21 @@ export default function ArticleView() {
                 <h1 className='mt-6 mb-4 text-2xl text-theme-800'>{title}</h1>
 
                 <div className='flex-1'>
-                    <QuillRenderer content={content} />
+                    <div className='flex flex-row my-4'>
+                        <Input
+                            className='w-full' placeholder='Jelentkezek emaillel...'
+                            values={[email, setEmail]} onEnter={handleRegistration}
+                        />  
+                        <Button onClick={handleRegistration} primary>Jelentkezés</Button>
+                    </div>
+
+                    {
+                        (status === AuthenticationStatus.SUCCESS)
+                            ? <ParticipantTable
+                                data={participantList}
+                            />
+                            : <p>Jelentkezők száma: {participantCount}</p>
+                    }
                 </div>
 
                 <div className='flex flex-col md:flex-row justify-end mt-14 mb-4'>

@@ -11,6 +11,7 @@ import org.springframework.http.HttpMethod
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
 import org.springframework.web.client.RestTemplate
+import org.springframework.web.client.RestClientResponseException
 import org.springframework.web.util.UriComponentsBuilder
 import java.time.OffsetDateTime
 
@@ -100,18 +101,23 @@ class EventService(
     fun registerToEvent(email: String, id: Long): Boolean {
         if (isRegisteredToEvent(email, id)) return true
 
-        val verification = RestTemplate().postForEntity(
-            configuration.emailVerificationUrl,
-            email,
-            String::class.java
-        )
+        try {
+            val verification = RestTemplate().postForEntity(
+                configuration.emailVerificationUrl,
+                email,
+                String::class.java
+            )
 
-        if (verification.statusCode.is2xxSuccessful) {
-            val event = repository.findByIdOrNull(id) ?: return false
-            event.participants.add(email)
+            if (verification.statusCode.is2xxSuccessful) {
+                val event = repository.findByIdOrNull(id) ?: return false
+                event.participants.add(email)
+                repository.save(event)
 
-            return true
-        } else {
+                return true
+            } else {
+                return false
+            }
+        } catch (e: RestClientResponseException) {
             return false
         }
     }

@@ -73,6 +73,27 @@ class ParticipantController(
     }
 
     /**
+     * Returns a participant by email.
+     *
+     * Requires authentication. If the given authentication
+     * token is invalid, returns an HTTP 403 response.
+     */
+    @GetMapping("/email/{email}")
+    fun getParticipantByEmail(
+        @RequestHeader("Auth-Token") token: String?,
+        @PathVariable email: String,
+        req: HttpServletRequest
+    ): ResponseEntity<ParticipantResponseDTO> {
+        if (!isTokenValid(token, req)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build()
+        }
+
+        val participant = participantService.getParticipantByEmail(email)
+            ?: return ResponseEntity.notFound().build()
+        return ResponseEntity.ok(participant.toDTO())
+    }
+
+    /**
      * Accepts a participant registration request in the form of a DTO, validates it,
      * and saves it in the database.
      *

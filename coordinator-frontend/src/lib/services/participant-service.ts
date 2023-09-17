@@ -21,6 +21,18 @@ export namespace ParticipantService {
     }
 
     /**
+     * Retrieve a single participant by email.
+     * Requires authentication.
+     */
+    export function getParticipantByEmail(email: String): Promise<any> {
+        return NetworkService.protectedAsJson({
+            path: '/api/participants/email/' + email,
+            method: 'GET'
+        });
+    }
+
+
+    /**
      * Post a participant. Does not require authentication.
      */
     export function post(participant: Participant): Promise<any> {

@@ -6,7 +6,7 @@ import { NetworkService } from "./network-service";
  * Every function returns a promise that fulfills when a connection is made and the
  * response is received, and fails in every other case.
  */
-export namespace EventsService {
+export namespace EventService {
 
     /**
      * Search the list of events with the given keywords filter.
@@ -19,9 +19,19 @@ export namespace EventsService {
     }
 
     /**
-     * Retrieve an event. Requires authentication.
+     * Retrieve an event. Does not require authentication, but the participant emails are not returned.
      */
-    export function get(id: string): Promise<any> {
+    export function getSummary(id: string): Promise<any> {
+        return NetworkService.publicAsJson({
+            path: '/api/events/' + id,
+            method: 'GET'
+        });
+    }
+
+    /**
+     * Retrieve an event. Requires authentication, but returns everything related to the event.
+     */
+    export function getDetails(id: string): Promise<any> {
         return NetworkService.protectedAsJson({
             path: '/api/events/administer/' + id,
             method: 'GET'
