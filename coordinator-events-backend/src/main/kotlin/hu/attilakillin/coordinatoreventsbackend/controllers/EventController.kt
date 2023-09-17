@@ -231,6 +231,37 @@ class EventController(
 
         return ResponseEntity.ok().build()
     }
+
+    /**
+     * Unregisters a given email from a given event.
+     *
+     * Returns an HTTP 400 response if the ID is not a valid number, or
+     * does not point to a valid event. Returns an HTTP 403 response
+     * if the registration was unsuccessful
+     * (probably because the email wasn't registered on the service we use
+     * to validate first).
+     * If everything succeeded, returns an HTTP 200 response.
+     */
+    @PostMapping("/unregister/{id}")
+    fun unregisterFromEvent(
+        @PathVariable id: String,
+        @RequestBody dto: RegisterRequestDTO,
+        req: HttpServletRequest
+    ): ResponseEntity<Unit> {
+        val parsedId = id.toLongOrNull()
+            ?: return ResponseEntity.badRequest().build()
+
+        eventService.getEvent(parsedId)
+            ?: return ResponseEntity.badRequest().build()
+
+        val success = eventService.unregisterFromEvent(dto.email, parsedId)
+        if (!success) {
+            logger.logUnregistrationUnsuccessful(req, parsedId, dto.email)
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build()
+        }
+
+        return ResponseEntity.ok().build()
+    }
 }
 
 /* Logging extension functions. */
@@ -249,5 +280,10 @@ private fun Logger.logEventModified(req: HttpServletRequest, event: Long, action
 
 private fun Logger.logRegistrationUnsuccessful(req: HttpServletRequest, event: Long, email: String) {
     val message = "Event registration unsuccessful: (event: '{}', email: '{}', IP '{}')"
+    info(message, event, email, req.realIp)
+}
+
+private fun Logger.logUnregistrationUnsuccessful(req: HttpServletRequest, event: Long, email: String) {
+    val message = "Event unregistration unsuccessful: (event: '{}', email: '{}', IP '{}')"
     info(message, event, email, req.realIp)
 }

@@ -80,4 +80,15 @@ export namespace EventService {
             body: { email: email }
         });
     }
+
+    /**
+     * Unregister an email from an event.
+     */
+    export function unregisterFromEvent(id: string, email: string): Promise<any> {
+        return NetworkService.protectedWithBodyAsJson({
+            path: '/api/events/unregister/' + id,
+            method: 'POST',
+            body: { email: email }
+        });
+    }
 };

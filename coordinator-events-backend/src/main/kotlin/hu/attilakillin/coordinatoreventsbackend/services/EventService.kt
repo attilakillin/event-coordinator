@@ -123,6 +123,19 @@ class EventService(
     }
 
     /**
+     * Unregisters the given email from an event.
+     */
+    fun unregisterFromEvent(email: String, id: Long): Boolean {
+        val event = repository.findByIdOrNull(id) ?: return false
+
+        if (!isRegisteredToEvent(email, id)) return true
+
+        event.participants.remove(email)
+        repository.save(event)
+        return true
+    }
+
+    /**
      * Returns a specific event by its ID. If the ID points to a
      * nonexistent entity, null is returned instead.
      */

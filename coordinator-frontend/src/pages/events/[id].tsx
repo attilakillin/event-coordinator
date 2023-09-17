@@ -10,6 +10,7 @@ import { ParticipantService } from "@/lib/services/participant-service";
 import ParticipantTable from "@/components/blocks/participants/participant-table";
 import { Participant } from "@/components/types/participant";
 import Id from "@/components/types/id";
+import Link from "next/link";
 
 /**
  * Displays the detailed view of an event. Only displays
@@ -33,6 +34,7 @@ export default function EventView() {
                 ? EventService.getDetails(router.query.id as string)
                     .then(data => {
                         setTitle(data.title);
+                        setParticipantList([]);
                         (data.participants as string[]).forEach(email => 
                             ParticipantService.getParticipantByEmail(email)
                                 .then(data =>
@@ -60,7 +62,6 @@ export default function EventView() {
 
     // Set up delete button handler.
     const handleDeleteButton = () => {
-        // TODO This is not what I want
         EventService.remove(router.query.id as string)
             .then(() => {
                 toast.success('Sikeres törlés!');
@@ -76,7 +77,7 @@ export default function EventView() {
                 toast.success('Sikeres jelentkezés!');
                 loadContent();
             })
-            .catch(() => toast.error('Hiba történt: Az eseményre való jelentkezés nem sikerült!'));
+            .catch(() => toast.error(<div>Hiba történt: Az eseményre való jelentkezés nem sikerült!<br/>Jelentkezés előtt regisztráljon!</div>));
     }
 
     // Responsive additional button styling
@@ -96,6 +97,9 @@ export default function EventView() {
                         />  
                         <Button onClick={handleRegistration} primary>Jelentkezés</Button>
                     </div>
+                    <p className='text-theme-800 mb-6 italic text-center'>
+                        A jelentkezés előfeltétele a <Link href='/participants/register' className='underline'>Regisztráció</Link> oldalon történő előzetes regisztráció.
+                    </p>
 
                     {
                         (status === AuthenticationStatus.SUCCESS)

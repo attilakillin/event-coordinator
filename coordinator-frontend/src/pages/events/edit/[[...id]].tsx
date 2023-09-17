@@ -36,6 +36,7 @@ export default function EventCreate() {
         EventService.getDetails(router.query.id as string)
             .then(data => {
                 setTitle(data.title);
+                setParticipants([]);
                 (data.participants as string[]).forEach(email => 
                     ParticipantService.getParticipantByEmail(email)
                         .then(data =>
@@ -65,10 +66,12 @@ export default function EventCreate() {
 
     // Delete registration button click handler.
     const handleRegistrationDeleteClick = (id: string) => {
-        EventService.remove(id)
+        const participant = participants.find(p => p.id === parseInt(id))!;
+
+        EventService.unregisterFromEvent(router.query.id as string, participant.email)
             .then(() => {
-                loadContent();
                 toast.success('Résztvevő jelentkezése sikeresen törölve!');
+                loadContent();
             })
             .catch(() => toast.error('Hiba történt: A résztvevő jelentkezésének törlése nem sikerült!'));
     }
