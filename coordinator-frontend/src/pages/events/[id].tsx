@@ -11,6 +11,7 @@ import ParticipantTable from "@/components/blocks/participants/participant-table
 import { Participant } from "@/components/types/participant";
 import Id from "@/components/types/id";
 import Link from "next/link";
+import LinkButton from "@/components/builtin/link-button";
 
 /**
  * Displays the detailed view of an event. Only displays
@@ -26,6 +27,7 @@ export default function EventView() {
     const [participantList, setParticipantList] = useState<(Participant & Id)[]>([]);
 
     const [email, setEmail] = useState('');
+    const [mailto, setMailto] = useState('');
 
     // Load event details upon page load.
     const loadContent = useCallback(() => {
@@ -41,6 +43,8 @@ export default function EventView() {
                                     setParticipantList(list => [...list, data])
                                 )
                         );
+
+                        setMailto('mailto:' + data.participants.join(',') + '?subject=' + data.title);
                     })
                 : EventService.getSummary(router.query.id as string)
                     .then(data => {
@@ -113,6 +117,7 @@ export default function EventView() {
                 <div className='flex flex-col md:flex-row justify-end mt-14 mb-4'>
                     {
                         (status == AuthenticationStatus.SUCCESS) && <>
+                            <LinkButton href={mailto}>Email küldése</LinkButton>
                             <Button onClick={handleEditButton} className={buttonStyles}>Szerkesztés</Button>
                             <Button onClick={handleDeleteButton} className={buttonStyles}>Törlés</Button>
                         </>
