@@ -117,7 +117,7 @@ export default function EventView() {
                 <div className='flex flex-col md:flex-row justify-end mt-14 mb-4'>
                     {
                         (status == AuthenticationStatus.SUCCESS) && <>
-                            <LinkButton href={mailto}>Email küldése</LinkButton>
+                            <LinkButton href={mailto} className={buttonStyles}>Email küldése</LinkButton>
                             <Button onClick={handleEditButton} className={buttonStyles}>Szerkesztés</Button>
                             <Button onClick={handleDeleteButton} className={buttonStyles}>Törlés</Button>
                         </>

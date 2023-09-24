@@ -21,7 +21,7 @@ interface ComponentProps {
  * Opens links in a new tab.
  */
 export default function LinkButton(props: ComponentProps) {
-    const styles = 'text-lg px-8 py-3 '
+    const styles = 'text-lg px-8 py-3 text-center '
         + (props.disabled ? '' : 'hover:outline hover:outline-3 hover:outline-theme-800 ')
         + (props.primary ? 'text-theme-100 bg-theme-800 ' : 'text-theme-800 ')
         + (props.className ? props.className : '');
