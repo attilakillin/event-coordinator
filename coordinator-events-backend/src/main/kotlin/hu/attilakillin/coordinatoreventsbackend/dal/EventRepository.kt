@@ -21,4 +21,11 @@ interface EventRepository : JpaRepository<Event, Long> {
             created DESC;
     """, nativeQuery = true)
     fun searchByTitle(keywords: String): List<Event>
+
+
+    @Query(value = """
+        SELECT * FROM events
+        ORDER BY created DESC
+    """, nativeQuery = true)
+    fun findAllOrdered(): List<Event>
 }

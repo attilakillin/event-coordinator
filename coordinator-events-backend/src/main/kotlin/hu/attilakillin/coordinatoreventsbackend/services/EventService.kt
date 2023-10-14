@@ -82,7 +82,7 @@ class EventService(
      */
     fun searchEvents(keywords: String?): List<Event> {
         if (keywords.isNullOrBlank()) {
-            return repository.findAll()
+            return repository.findAllOrdered()
         }
 
         return repository.searchByTitle(keywords)
