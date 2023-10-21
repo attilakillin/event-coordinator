@@ -47,7 +47,8 @@ const authPaths: DropdownLink[] = [
         name: 'Események',
         children: [
             { name: 'Eseménylista', path: '/events' },
-            { name: 'Új esemény', path: '/events/edit' }
+            { name: 'Új esemény', path: '/events/edit' },
+            { name: 'Kapu', path: '/checkin' }
         ]
     }
 ];

@@ -34,7 +34,7 @@ class CheckinController(
     /**
      * Authenticate with the given token, and return whether the token is valid, or not.
      */
-    fun isTokenValid(token: String?, req: HttpServletRequest): Boolean {
+    fun isTokenValid(token: String?, req: HttpServletRequest?): Boolean {
         val claims = authService.getVerifiedClaims(token)
         if (claims == null) {
             logger.logTokenNotVerified(req)
@@ -81,10 +81,9 @@ class CheckinController(
     @SendTo("/topic/checkins")
     fun updateOne(
         @Payload dto: CheckinDTO,
-        @Header("Auth-Token") token: String?,
-        req: HttpServletRequest
+        @Header("Auth-Token") token: String?
     ): CheckinDTO {
-        if (!isTokenValid(token, req)) {
+        if (!isTokenValid(token, null)) {
             throw ForbiddenException()
         }
 
@@ -101,9 +100,9 @@ class CheckinController(
 
 private val HttpServletRequest.realIp get() = getHeader("X-Real-Ip")
 
-private fun Logger.logTokenNotVerified(req: HttpServletRequest) {
+private fun Logger.logTokenNotVerified(req: HttpServletRequest?) {
     val message = "Token verification failed: (IP: '{}', requested path: '{}', method: '{}')"
-    info(message, req.realIp, req.requestURI, req.method)
+    info(message, req?.realIp ?: "", req?.requestURI ?: "", req?.method ?: "")
 }
 
 private fun Logger.logEventModified(req: HttpServletRequest, event: Long, action: String, subject: String) {

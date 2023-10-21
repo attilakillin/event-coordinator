@@ -24,6 +24,6 @@ class StompConfiguration : WebSocketMessageBrokerConfigurer {
      * Register application endpoints that will be intercepted by STOMP.
      */
     override fun registerStompEndpoints(registry: StompEndpointRegistry) {
-        registry.addEndpoint("/websocket-checkin")
+        registry.addEndpoint("/websocket-checkin").setAllowedOrigins("*")
     }
 }

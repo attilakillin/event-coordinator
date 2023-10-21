@@ -20,7 +20,7 @@ data class Event(
     var title: String,
 
     /** The list of registered participant emails to this event, and their check-in status */
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     @MapKeyColumn(name = "email")
     @Column(name = "status")
     @Enumerated(EnumType.STRING)
