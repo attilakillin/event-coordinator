@@ -16,12 +16,14 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestHeader
+import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder
 
 @RestController
 @CrossOrigin
+@RequestMapping("/events")
 class EventController(
     private val eventService: EventService,
     private val authService: AuthService
@@ -67,7 +69,7 @@ class EventController(
      */
     @GetMapping("/")
     fun searchEvents(@RequestParam keywords: String?): ResponseEntity<List<EventSummaryDTO>> {
-        val events = eventService.searchEvents(keywords,)
+        val events = eventService.searchEvents(keywords)
 
         return ResponseEntity.ok(events.map { it.toSummaryDTO() })
     }

@@ -9,5 +9,6 @@ CREATE TABLE IF NOT EXISTS events (
 CREATE TABLE IF NOT EXISTS participants (
     id        INTEGER                    NOT NULL,
     email     VARCHAR(255)               NOT NULL,
+    status    VARCHAR(255)               NOT NULL,
     FOREIGN KEY (id) REFERENCES events (id)
 );

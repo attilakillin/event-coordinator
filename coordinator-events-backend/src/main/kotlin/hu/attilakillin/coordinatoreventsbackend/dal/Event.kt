@@ -19,9 +19,11 @@ data class Event(
     /** The title of the event. */
     var title: String,
 
-    /** The list of registered participant emails to this event */
+    /** The list of registered participant emails to this event, and their check-in status */
     @ElementCollection
+    @MapKeyColumn(name = "email")
+    @Column(name = "status")
+    @Enumerated(EnumType.STRING)
     @CollectionTable(name = "participants", joinColumns = [JoinColumn(name = "id")])
-    @Column(name = "email")
-    var participants: MutableList<String>
+    var participants: MutableMap<String, CheckinStatus>
 )

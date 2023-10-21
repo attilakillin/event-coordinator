@@ -24,6 +24,6 @@ fun Event.toDTO(): EventResponseDTO {
     return EventResponseDTO(
         created = this.created,
         title = this.title,
-        participants = this.participants
+        participants = this.participants.map { it.key }
     )
 }

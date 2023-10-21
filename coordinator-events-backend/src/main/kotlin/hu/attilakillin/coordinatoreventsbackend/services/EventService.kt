@@ -1,6 +1,7 @@
 package hu.attilakillin.coordinatoreventsbackend.services
 
 import hu.attilakillin.coordinatoreventsbackend.config.PropertiesConfiguration
+import hu.attilakillin.coordinatoreventsbackend.dal.CheckinStatus
 import hu.attilakillin.coordinatoreventsbackend.dal.Event
 import hu.attilakillin.coordinatoreventsbackend.dal.EventRepository
 import hu.attilakillin.coordinatoreventsbackend.dto.EventRequestDTO
@@ -46,7 +47,7 @@ class EventService(
         return checkThenSaveEvent(Event(
             created = OffsetDateTime.now(),
             title = dto.title,
-            participants = mutableListOf()
+            participants = mutableMapOf()
         ))
     }
 
@@ -110,7 +111,7 @@ class EventService(
 
             if (verification.statusCode.is2xxSuccessful) {
                 val event = repository.findByIdOrNull(id) ?: return false
-                event.participants.add(email)
+                event.participants.set(email, CheckinStatus.UNKNOWN)
                 repository.save(event)
 
                 return true
