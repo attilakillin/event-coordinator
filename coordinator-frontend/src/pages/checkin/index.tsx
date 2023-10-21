@@ -30,11 +30,12 @@ export default function CheckinIndex() {
     const setWithAdditionalData = (status: CheckinStatus) => {
         ParticipantService.getParticipantByEmail(status.email)
             .then(info => {
-                setAllParticipants(list => [...list, {
+                const current = {
                     ...status,
                     firstName: info.firstName,
                     lastName: info.lastName
-                }])
+                };
+                setAllParticipants(list => [...list, current].sort((a, b) => a.email.localeCompare(b.email)))
             });
     };
     
@@ -79,7 +80,7 @@ export default function CheckinIndex() {
                     setAllParticipants(list =>
                         [
                             ...list.map(e => (e.eventId == current.eventId && e.email == current.email) ? current : e)
-                        ]
+                        ].sort((a, b) => a.email.localeCompare(b.email))
                     );
                 });
         });
