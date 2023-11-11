@@ -36,6 +36,8 @@ dependencies {
 		exclude(module = "mockito-core")
 	}
 	testImplementation("io.mockk:mockk:1.12.0")
+	testImplementation("com.ninja-squad:springmockk:4.0.2")
+	testImplementation("com.h2database:h2:1.3.148")
 }
 
 tasks.withType<KotlinCompile> {
@@ -52,4 +54,25 @@ tasks.withType<BootJar> {
 
 tasks.withType<Test> {
 	useJUnitPlatform()
+}
+
+sourceSets {
+	create("test-integration") {
+		kotlin {
+			compileClasspath += main.get().output + configurations.testRuntimeClasspath
+			runtimeClasspath += output + compileClasspath
+		}
+	}
+}
+
+val testIntegration = task<Test>("testIntegration") {
+	group = "verification"
+
+	testClassesDirs = sourceSets["test-integration"].output.classesDirs
+	classpath = sourceSets["test-integration"].runtimeClasspath
+	shouldRunAfter(tasks["test"])
+}
+
+tasks.check {
+	dependsOn(testIntegration)
 }

@@ -31,6 +31,7 @@ dependencies {
 	runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.11.5")
 
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
+	testImplementation("com.h2database:h2:1.3.148")
 }
 
 tasks.withType<KotlinCompile> {
@@ -47,4 +48,25 @@ tasks.withType<BootJar> {
 
 tasks.withType<Test> {
 	useJUnitPlatform()
+}
+
+sourceSets {
+	create("test-integration") {
+		kotlin {
+			compileClasspath += main.get().output + configurations.testRuntimeClasspath
+			runtimeClasspath += output + compileClasspath
+		}
+	}
+}
+
+val testIntegration = task<Test>("testIntegration") {
+	group = "verification"
+
+	testClassesDirs = sourceSets["test-integration"].output.classesDirs
+	classpath = sourceSets["test-integration"].runtimeClasspath
+	shouldRunAfter(tasks["test"])
+}
+
+tasks.check {
+	dependsOn(testIntegration)
 }

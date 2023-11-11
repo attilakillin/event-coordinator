@@ -1,0 +1,6 @@
+# Set used DB to in-memory H2
+spring:
+  datasource:
+    driver-class-name: 'org.h2.Driver'
+  jpa:
+    database: h2
